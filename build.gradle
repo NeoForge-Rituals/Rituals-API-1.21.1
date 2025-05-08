@@ -1,8 +1,10 @@
 plugins {
     id 'java-library'
+    id 'eclipse'
+    id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle.userdev' version '7.0.184'
-    id 'org.jetbrains.kotlin.jvm'
+    id 'net.neoforged.gradle.userdev' version '7.0.170'
+    id "org.jetbrains.kotlin.jvm" version ("2.0.21")
 }
 
 tasks.named('wrapper', Wrapper).configure {
@@ -15,6 +17,10 @@ group = mod_group_id
 repositories {
     mavenLocal()
     mavenCentral()
+    maven {
+        name = "Kotlin for Forge"
+        setUrl("https://thedarkcolour.github.io/KotlinForForge/")
+    }
 }
 
 base {
@@ -56,7 +62,7 @@ configurations {
 
 dependencies {
     implementation "net.neoforged:neoforge:${neo_version}"
-    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
+    implementation("thedarkcolour:kotlinforforge-neoforge:$kff_version")
 }
 
 tasks.withType(ProcessResources).configureEach {
@@ -65,6 +71,8 @@ tasks.withType(ProcessResources).configureEach {
             minecraft_version_range: minecraft_version_range,
             neo_version            : neo_version,
             neo_version_range      : neo_version_range,
+            kff_version            : kff_version,
+            kff_version_range      : kff_version_range,
             loader_version_range   : loader_version_range,
             mod_id                 : mod_id,
             mod_name               : mod_name,
@@ -101,16 +109,5 @@ idea {
     module {
         downloadSources = true
         downloadJavadoc = true
-    }
-}
-kotlin {
-    jvmToolchain(21)
-}
-
-sourceSets {
-    main {
-        kotlin {
-            srcDirs = ['src/main/kotlin']
-        }
     }
 }
