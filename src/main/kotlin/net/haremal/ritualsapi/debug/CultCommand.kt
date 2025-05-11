@@ -3,6 +3,7 @@ package net.haremal.ritualsapi.debug
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.suggestion.SuggestionProvider
+import net.haremal.ritualsapi.api.cults.Cult
 import net.haremal.ritualsapi.api.cults.CultMemberManager
 import net.haremal.ritualsapi.api.cults.CultRegistry
 import net.minecraft.commands.CommandSourceStack
@@ -38,15 +39,15 @@ object CultCommand {
                         val player = ctx.source.entity as? ServerPlayer ?: return@executes 0
                         val cultId = ResourceLocationArgument.getId(ctx, "cultId")
 
-                        // Check if cult exists
+                        // Check if a cult exists
                         val cult = CultRegistry.get(cultId)
                         if (cult == null) {
                             player.sendSystemMessage(Component.literal("Cult '$cultId' does not exist."))
                             return@executes 1
                         }
-
                         // Join the cult
                         CultMemberManager.joinCult(player, cult)
+                        cult.onJoin(player)
                         player.sendSystemMessage(Component.literal("You have joined the cult: ${cult.name}"))
                         1
                     }
