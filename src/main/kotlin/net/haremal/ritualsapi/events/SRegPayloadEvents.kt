@@ -13,7 +13,7 @@ import net.neoforged.neoforge.network.registration.HandlerThread
 
 
 @EventBusSubscriber(modid = RitualsAPI.MODID, bus = EventBusSubscriber.Bus.MOD)
-object SPayloadEvents {
+object SRegPayloadEvents {
     @SubscribeEvent
     fun register(event: RegisterPayloadHandlersEvent) {
         val registrar = event.registrar("1").executesOn(HandlerThread.NETWORK)

@@ -2,10 +2,13 @@ package net.haremal.ritualsapi.network
 
 import io.netty.buffer.ByteBuf
 import net.haremal.ritualsapi.RitualsAPI
+import net.haremal.ritualsapi.debug.ExampleCult.magicSourceEnergy
 import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.server.level.ServerPlayer
+import net.neoforged.neoforge.network.PacketDistributor
 
 data class SyncEnergyPacket(val cultEnergy: Int): CustomPacketPayload {
     companion object {
@@ -15,6 +18,10 @@ data class SyncEnergyPacket(val cultEnergy: Int): CustomPacketPayload {
             SyncEnergyPacket::cultEnergy,
             ::SyncEnergyPacket
         )
+
+        fun syncToPlayer(player: ServerPlayer){
+            PacketDistributor.sendToPlayer(player, SyncEnergyPacket(magicSourceEnergy(player)))
+        }
     }
 
     override fun type(): CustomPacketPayload.Type<out CustomPacketPayload> = TYPE

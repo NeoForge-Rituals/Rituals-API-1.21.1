@@ -11,15 +11,11 @@ object ExampleCult : Cult(
     ResourceLocation.tryParse("ritualsapi:obsidian_dawn") ?: error("Invalid ResourceLocation"),
     Component.literal("Obsidian Dawn"),
     "Devoted to void rituals",
-    Color(0x000000), // Black color as example
+    Color(0x000000), // Black color as an example
     "Stone Amount",
     listOf(ResourceLocation.tryParse("ritualsapi:spawns/obsidian_ritualist") ?: error("Invalid ResourceLocation"))
 ) {
-
-    override fun onJoin(player: ServerPlayer) {
-        player.sendSystemMessage(Component.literal("The void accepts you."))
-    }
-
+    override fun onJoin(player: ServerPlayer) {}
 
     override fun joinReason(player: ServerPlayer): Boolean {
         return player.inventory.contains(Items.STONE.defaultInstance)

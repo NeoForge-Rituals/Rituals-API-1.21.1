@@ -25,7 +25,7 @@ abstract class Cult (
         world.players().forEach { player ->
             joinThisCult(player)
             if (!player.level().isClientSide) {
-                PacketDistributor.sendToPlayer(player, SyncEnergyPacket(magicSourceEnergy(player)))
+                SyncEnergyPacket.syncToPlayer(player)
             }
         }
     }
