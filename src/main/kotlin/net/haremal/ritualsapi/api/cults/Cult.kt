@@ -8,7 +8,6 @@ import net.minecraft.network.chat.MutableComponent
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
-import net.neoforged.neoforge.network.PacketDistributor
 import java.awt.Color
 
 abstract class Cult (
@@ -19,27 +18,27 @@ abstract class Cult (
     val magicSource: String,
     val followersSpawns: List<ResourceLocation> = emptyList()
 ) {
+    private var lastSyncedEnergy = -1
+    var magicEnergy: Int = 0
+
     // Default
     abstract fun onJoin(player: ServerPlayer)
     open fun onTick(world: ServerLevel) {
         world.players().forEach { player ->
-            joinThisCult(player)
             if (!player.level().isClientSide) {
-                SyncEnergyPacket.syncToPlayer(player)
+                magicSourceEnergy(player)
+                if (magicEnergy != lastSyncedEnergy) {
+                    lastSyncedEnergy = magicEnergy
+                    SyncEnergyPacket.syncToPlayer(player)
+                }
             }
         }
     }
 
     // Variables
     open fun joinReason(player: ServerPlayer): Boolean = false
-    open fun magicSourceEnergy(player: ServerPlayer): Int = 0
-
-    // Functions
-    private fun joinThisCult(player: ServerPlayer) {
-        if (getCult(player) == null && joinReason(player)) {
-            joinCult(player, this)
-            onJoin(player)
-            player.sendSystemMessage(Component.literal("You have joined the cult: ${name.string}"))
-        }
+    open fun magicSourceEnergy(player: ServerPlayer) { callWithEnergy(player){true}}
+    protected fun callWithEnergy(player: ServerPlayer, logic: () -> Boolean) {
+        magicEnergy.takeIf { it < 100 }?.let { if (logic()) magicEnergy++ }
     }
 }

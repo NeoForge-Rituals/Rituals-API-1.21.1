@@ -1,7 +1,9 @@
 package net.haremal.ritualsapi.api.cults
 
 import net.haremal.ritualsapi.network.SyncCultPacket
+import net.minecraft.network.chat.Component
 import net.minecraft.resources.ResourceLocation
+import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 
 object CultMemberManager {
@@ -15,6 +17,19 @@ object CultMemberManager {
     fun leaveCult(player: ServerPlayer) {
         player.persistentData.remove(CULT_ID_KEY) // Optional: clear data on leave
         SyncCultPacket.syncToPlayer(player, null)
+    }
+
+    fun tickCult(level: ServerLevel) {
+        CultRegistry.all().forEach { cult ->
+            cult.onTick(level)
+            level.players().forEach { player ->
+                if (getCult(player) == null && cult.joinReason(player)) {
+                    joinCult(player, cult)
+                    cult.onJoin(player)
+                    player.sendSystemMessage(Component.literal("You have joined the cult: ${cult.name.string}"))
+                }
+            }
+        }
     }
 
     // SERVER SIDE ONLY

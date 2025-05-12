@@ -2,7 +2,7 @@ package net.haremal.ritualsapi.network
 
 import io.netty.buffer.ByteBuf
 import net.haremal.ritualsapi.RitualsAPI
-import net.haremal.ritualsapi.debug.ExampleCult.magicSourceEnergy
+import net.haremal.ritualsapi.api.cults.CultMemberManager
 import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload
@@ -20,7 +20,7 @@ data class SyncEnergyPacket(val cultEnergy: Int): CustomPacketPayload {
         )
 
         fun syncToPlayer(player: ServerPlayer){
-            PacketDistributor.sendToPlayer(player, SyncEnergyPacket(magicSourceEnergy(player)))
+            PacketDistributor.sendToPlayer(player, SyncEnergyPacket(CultMemberManager.getCult(player)?.magicEnergy ?: 0))
         }
     }
 
