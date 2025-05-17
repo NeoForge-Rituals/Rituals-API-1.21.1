@@ -1,4 +1,4 @@
-package net.haremal.ritualsapi.events.cult
+package net.haremal.ritualsapi.events
 
 import net.haremal.ritualsapi.RitualsAPI
 import net.haremal.ritualsapi.network.PayloadHandlers
@@ -11,7 +11,7 @@ import net.neoforged.neoforge.network.handling.DirectionalPayloadHandler
 import net.neoforged.neoforge.network.registration.HandlerThread
 
 @EventBusSubscriber(modid = RitualsAPI.Companion.MODID, bus = EventBusSubscriber.Bus.MOD)
-object SMPayloadEvents {
+object NetworkSMEvents {
     @SubscribeEvent
     fun register(event: RegisterPayloadHandlersEvent) {
         val registrar = event.registrar("1").executesOn(HandlerThread.NETWORK)

@@ -1,4 +1,4 @@
-package net.haremal.ritualsapi.events.entity
+package net.haremal.ritualsapi.events
 
 import net.haremal.ritualsapi.RitualsAPI
 import net.haremal.ritualsapi.mod.ModRegistries
@@ -11,7 +11,7 @@ import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent
 
 @EventBusSubscriber(modid = RitualsAPI.Companion.MODID, bus = EventBusSubscriber.Bus.MOD)
-object SMAttributesEvents {
+object EntitySMEvents {
     @SubscribeEvent
     fun onEntityAttributes(event: EntityAttributeCreationEvent) {
         event.put(
@@ -22,5 +22,4 @@ object SMAttributesEvents {
                 .build()
         )
     }
-
 }

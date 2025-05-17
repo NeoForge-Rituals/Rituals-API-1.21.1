@@ -1,4 +1,4 @@
-package net.haremal.ritualsapi.events.entity
+package net.haremal.ritualsapi.events
 
 import net.haremal.ritualsapi.RitualsAPI
 import net.haremal.ritualsapi.mod.ModRegistries
@@ -14,7 +14,7 @@ import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.client.event.EntityRenderersEvent
 
 @EventBusSubscriber(modid = RitualsAPI.Companion.MODID, bus = EventBusSubscriber.Bus.MOD, value = [Dist.CLIENT])
-object CMRenderEvents {
+object EntityCMEvents {
     @SubscribeEvent
     fun onRegisterRenderers(event: EntityRenderersEvent.RegisterRenderers) {
         event.registerEntityRenderer(ModRegistries.CULT_FOLLOWER.get()) { c -> CultFollowerRenderer(c) }

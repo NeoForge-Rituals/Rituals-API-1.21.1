@@ -1,4 +1,4 @@
-package net.haremal.ritualsapi.events.cult
+package net.haremal.ritualsapi.events
 
 import net.haremal.ritualsapi.RitualsAPI
 import net.haremal.ritualsapi.api.cults.CultMemberManager
@@ -11,7 +11,7 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent
 import net.neoforged.neoforge.event.tick.LevelTickEvent
 
 @EventBusSubscriber(modid = RitualsAPI.MODID, bus = EventBusSubscriber.Bus.GAME)
-object SGCultEvents {
+object CultSGEvents {
     @SubscribeEvent
     fun onServerTick(event: LevelTickEvent.Post) {
         val level = event.level
