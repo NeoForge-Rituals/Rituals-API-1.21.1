@@ -1,0 +1,15 @@
+{
+  "name": "ritualsapi:cult_camp/parts/churches",
+  "fallback": "minecraft:empty",
+  "elements": [
+    {
+      "element": {
+        "element_type": "minecraft:single_pool_element",
+        "location": "ritualsapi:cult_camp/parts/church",
+        "processors": "minecraft:empty",
+        "projection": "rigid"
+      },
+      "weight": 1
+    }
+  ]
+}

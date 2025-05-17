@@ -1,4 +1,4 @@
-package net.haremal.ritualsapi.events
+package net.haremal.ritualsapi.events.cult
 
 import com.mojang.blaze3d.systems.RenderSystem
 import net.haremal.ritualsapi.RitualsAPI
@@ -14,7 +14,7 @@ import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.client.event.RenderGuiEvent
 
 @EventBusSubscriber(modid = RitualsAPI.Companion.MODID, bus = EventBusSubscriber.Bus.GAME, value = [Dist.CLIENT])
-object CGameRenderEvents {
+object CGHudEvents {
     private val CULT_BAR_TEXTURE = ResourceLocation.fromNamespaceAndPath(RitualsAPI.Companion.MODID,"textures/gui/cult_bar.png")
 
     @SubscribeEvent

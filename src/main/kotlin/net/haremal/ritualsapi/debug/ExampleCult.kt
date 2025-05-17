@@ -13,9 +13,7 @@ object ExampleCult : Cult(
     ResourceLocation.tryParse("ritualsapi:obsidian_dawn") ?: error("Invalid ResourceLocation"),
     Component.literal("Obsidian Dawn"),
     "Devoted to void rituals",
-    Color(0x000000), // Black color as an example
-    "Obsidian",
-    listOf(ResourceLocation.tryParse("ritualsapi:spawns/obsidian_ritualist") ?: error("Invalid ResourceLocation"))
+    Color(0x000020), Color(0x626262)
 ) {
     override fun onJoin(player: ServerPlayer) {}
 

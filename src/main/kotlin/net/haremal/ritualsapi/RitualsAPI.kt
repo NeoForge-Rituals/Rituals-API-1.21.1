@@ -1,11 +1,12 @@
 package net.haremal.ritualsapi
 
-import com.mojang.logging.LogUtils
 import net.haremal.ritualsapi.api.cults.CultRegistry
 import net.haremal.ritualsapi.debug.ExampleCult
 import net.haremal.ritualsapi.debug.CultCommand
-import net.minecraft.core.registries.Registries
-import net.minecraft.world.item.CreativeModeTab
+import net.haremal.ritualsapi.mod.ModRegistries.BLOCKS
+import net.haremal.ritualsapi.mod.ModRegistries.CREATIVE_MODE_TABS
+import net.haremal.ritualsapi.mod.ModRegistries.ENTITY_TYPES
+import net.haremal.ritualsapi.mod.ModRegistries.ITEMS
 import net.neoforged.bus.api.IEventBus
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.ModContainer
@@ -13,28 +14,22 @@ import net.neoforged.fml.common.Mod
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent
 import net.neoforged.neoforge.common.NeoForge
 import net.neoforged.neoforge.event.RegisterCommandsEvent
-import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent
-import net.neoforged.neoforge.network.handling.DirectionalPayloadHandler
-import net.neoforged.neoforge.network.registration.PayloadRegistrar
-import net.neoforged.neoforge.registries.DeferredRegister
 
 @Mod(RitualsAPI.MODID)
 class RitualsAPI {
     companion object {
         const val MODID = "ritualsapi"
-        val BLOCKS: DeferredRegister.Blocks = DeferredRegister.createBlocks(MODID)
-        val ITEMS: DeferredRegister.Items = DeferredRegister.createItems(MODID)
-        val CREATIVE_MODE_TABS: DeferredRegister<CreativeModeTab> = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID)
     }
 
     constructor(modEventBus: IEventBus, modContainer: ModContainer) {
         modEventBus.addListener(::onCommonSetup)
         NeoForge.EVENT_BUS.register(this)
 
-        // VANILLA
+        // MOD
         BLOCKS.register(modEventBus)
         ITEMS.register(modEventBus)
         CREATIVE_MODE_TABS.register(modEventBus)
+        ENTITY_TYPES.register(modEventBus)
 
         // API
         CultRegistry.init()

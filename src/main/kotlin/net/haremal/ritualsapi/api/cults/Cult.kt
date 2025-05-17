@@ -1,9 +1,6 @@
 package net.haremal.ritualsapi.api.cults
 
-import net.haremal.ritualsapi.api.cults.CultMemberManager.getCult
-import net.haremal.ritualsapi.api.cults.CultMemberManager.joinCult
 import net.haremal.ritualsapi.network.SyncEnergyPacket
-import net.minecraft.network.chat.Component
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerLevel
@@ -14,9 +11,8 @@ abstract class Cult (
     val id: ResourceLocation,
     val name: MutableComponent,
     val description: String,
-    val color: Color,
-    val magicSource: String,
-    val followersSpawns: List<ResourceLocation> = emptyList()
+    val maincolor: Color,
+    val seccolor: Color
 ) {
     private var lastSyncedEnergy = -1
     var magicEnergy: Int = 0
@@ -36,7 +32,7 @@ abstract class Cult (
     }
 
     // Variables
-    open fun joinReason(player: ServerPlayer): Boolean = false
+    open fun joinReason( player: ServerPlayer): Boolean = false
     open fun magicSourceEnergy(player: ServerPlayer) { callWithEnergy(player){true}}
     protected fun callWithEnergy(player: ServerPlayer, logic: () -> Boolean) {
         magicEnergy.takeIf { it < 100 }?.let { if (logic()) magicEnergy++ }
