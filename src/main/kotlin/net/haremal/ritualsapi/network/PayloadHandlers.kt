@@ -13,4 +13,9 @@ object PayloadHandlers {
             SyncCultPacket.ClientCultCache.id = data.cultId
         }
     }
+    fun clientHandlePaintPacket(data: SyncPaintPacket, context: IPayloadContext) {
+        context.enqueueWork {
+            SyncPaintPacket.ClientPaintCache.canvas[data.pos] = data.pixels
+        }
+    }
 }

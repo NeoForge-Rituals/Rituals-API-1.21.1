@@ -1,13 +1,11 @@
 package net.haremal.ritualsapi.mod
 
 import com.google.common.base.Supplier
-import net.haremal.ritualsapi.RitualsAPI
 import net.haremal.ritualsapi.RitualsAPI.Companion.MODID
-import net.haremal.ritualsapi.mod.ModRegistries.ENTITY_TYPES
 import net.haremal.ritualsapi.mod.entity.CultFollowerEntity
+import net.haremal.ritualsapi.mod.item.RitualDaggerItem
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.registries.Registries
-import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.MobCategory
 import net.minecraft.world.item.CreativeModeTab
@@ -27,6 +25,7 @@ object ModRegistries {
     })
 
     val ITEMS: DeferredRegister.Items = DeferredRegister.createItems(MODID)
+    val RITUAL_DAGGER: DeferredItem<RitualDaggerItem?> = ITEMS.register("ritual_dagger", Supplier { RitualDaggerItem(Item.Properties()) })
     val CULT_FOLLOWER_SPAWN_EGG: DeferredItem<DeferredSpawnEggItem> = ITEMS.register("cult_follower_spawn_egg", Supplier<DeferredSpawnEggItem> {
         DeferredSpawnEggItem(
             CULT_FOLLOWER,

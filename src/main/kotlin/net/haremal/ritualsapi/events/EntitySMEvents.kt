@@ -19,6 +19,8 @@ object EntitySMEvents {
             Mob.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 20.0)
                 .add(Attributes.MOVEMENT_SPEED, 0.25)
+                .add(Attributes.ATTACK_DAMAGE, 6.0)
+                .add(Attributes.FOLLOW_RANGE, 32.0)
                 .build()
         )
     }

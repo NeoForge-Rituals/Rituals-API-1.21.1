@@ -21,7 +21,7 @@ abstract class Cult (
     abstract fun onJoin(player: ServerPlayer)
     open fun onTick(world: ServerLevel) {
         world.players().forEach { player ->
-            if (!player.level().isClientSide) {
+            if (!player.level().isClientSide && CultMemberManager.getCult(player)?.id == id) {
                 magicSourceEnergy(player)
                 if (magicEnergy != lastSyncedEnergy) {
                     lastSyncedEnergy = magicEnergy
