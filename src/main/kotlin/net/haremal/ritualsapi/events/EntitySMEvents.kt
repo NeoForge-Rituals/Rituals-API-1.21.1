@@ -1,7 +1,7 @@
 package net.haremal.ritualsapi.events
 
 import net.haremal.ritualsapi.RitualsAPI
-import net.haremal.ritualsapi.mod.ModRegistries
+import net.haremal.ritualsapi.api.ModRegistries
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.Mob

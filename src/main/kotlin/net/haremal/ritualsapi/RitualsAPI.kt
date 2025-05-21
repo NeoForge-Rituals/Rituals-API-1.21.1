@@ -3,10 +3,10 @@ package net.haremal.ritualsapi
 import net.haremal.ritualsapi.api.cults.CultRegistry
 import net.haremal.ritualsapi.debug.ExampleCult
 import net.haremal.ritualsapi.debug.CultCommand
-import net.haremal.ritualsapi.mod.ModRegistries.BLOCKS
-import net.haremal.ritualsapi.mod.ModRegistries.CREATIVE_MODE_TABS
-import net.haremal.ritualsapi.mod.ModRegistries.ENTITY_TYPES
-import net.haremal.ritualsapi.mod.ModRegistries.ITEMS
+import net.haremal.ritualsapi.api.ModRegistries.BLOCKS
+import net.haremal.ritualsapi.api.ModRegistries.CREATIVE_MODE_TABS
+import net.haremal.ritualsapi.api.ModRegistries.ENTITY_TYPES
+import net.haremal.ritualsapi.api.ModRegistries.ITEMS
 import net.neoforged.bus.api.IEventBus
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.ModContainer

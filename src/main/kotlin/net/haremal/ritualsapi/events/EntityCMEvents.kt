@@ -1,8 +1,8 @@
 package net.haremal.ritualsapi.events
 
 import net.haremal.ritualsapi.RitualsAPI
-import net.haremal.ritualsapi.mod.ModRegistries
-import net.haremal.ritualsapi.mod.entity.CultFollowerEntity
+import net.haremal.ritualsapi.api.ModRegistries
+import net.haremal.ritualsapi.api.entity.CultFollowerEntity
 import net.minecraft.client.model.VillagerModel
 import net.minecraft.client.model.geom.ModelLayers
 import net.minecraft.client.renderer.entity.EntityRendererProvider

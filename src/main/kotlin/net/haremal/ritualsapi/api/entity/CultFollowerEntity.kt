@@ -1,4 +1,4 @@
-package net.haremal.ritualsapi.mod.entity
+package net.haremal.ritualsapi.api.entity
 
 import net.minecraft.util.TimeUtil
 import net.minecraft.util.valueproviders.UniformInt

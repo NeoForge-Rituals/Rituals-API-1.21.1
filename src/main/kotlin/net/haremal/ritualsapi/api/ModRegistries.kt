@@ -1,15 +1,17 @@
-package net.haremal.ritualsapi.mod
+package net.haremal.ritualsapi.api
 
 import com.google.common.base.Supplier
 import net.haremal.ritualsapi.RitualsAPI.Companion.MODID
-import net.haremal.ritualsapi.mod.entity.CultFollowerEntity
-import net.haremal.ritualsapi.mod.item.RitualDaggerItem
+import net.haremal.ritualsapi.api.entity.CultFollowerEntity
+import net.haremal.ritualsapi.api.item.RitualDaggerItem
+import net.minecraft.core.BlockPos
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.registries.Registries
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.MobCategory
 import net.minecraft.world.item.CreativeModeTab
 import net.minecraft.world.item.Item
+import net.minecraft.world.phys.Vec3
 import net.neoforged.neoforge.common.DeferredSpawnEggItem
 import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.DeferredItem
@@ -25,7 +27,11 @@ object ModRegistries {
     })
 
     val ITEMS: DeferredRegister.Items = DeferredRegister.createItems(MODID)
-    val RITUAL_DAGGER: DeferredItem<RitualDaggerItem?> = ITEMS.register("ritual_dagger", Supplier { RitualDaggerItem(Item.Properties()) })
+    val RITUAL_DAGGER: DeferredItem<RitualDaggerItem?> = ITEMS.register("ritual_dagger", Supplier {
+        RitualDaggerItem(
+            Item.Properties()
+        )
+    })
     val CULT_FOLLOWER_SPAWN_EGG: DeferredItem<DeferredSpawnEggItem> = ITEMS.register("cult_follower_spawn_egg", Supplier<DeferredSpawnEggItem> {
         DeferredSpawnEggItem(
             CULT_FOLLOWER,
@@ -37,4 +43,17 @@ object ModRegistries {
 
     val BLOCKS: DeferredRegister.Blocks = DeferredRegister.createBlocks(MODID)
     val CREATIVE_MODE_TABS: DeferredRegister<CreativeModeTab> = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID)
+
+
+    object BloodDataStorage {
+        val bloodPixels = mutableListOf<BloodPixelData>()
+        data class BloodPixelData (
+            val blockPos: Vec3,
+            val pixelPos: Vec3,
+            val color: Triple<Int, Int, Int>
+        )
+    }
 }
+
+
+
