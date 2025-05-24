@@ -2,10 +2,13 @@ package net.haremal.ritualsapi.events
 
 import net.haremal.ritualsapi.RitualsAPI
 import net.haremal.ritualsapi.api.ModRegistries
+import net.haremal.ritualsapi.api.entity.BloodStainEntity
 import net.haremal.ritualsapi.api.entity.CultFollowerEntity
 import net.minecraft.client.model.VillagerModel
 import net.minecraft.client.model.geom.ModelLayers
+import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.EntityRendererProvider
+import net.minecraft.client.renderer.entity.EntityRenderers
 import net.minecraft.client.renderer.entity.MobRenderer
 import net.minecraft.resources.ResourceLocation
 import net.neoforged.api.distmarker.Dist
@@ -18,17 +21,18 @@ object EntityCMEvents {
     @SubscribeEvent
     fun onRegisterRenderers(event: EntityRenderersEvent.RegisterRenderers) {
         event.registerEntityRenderer(ModRegistries.CULT_FOLLOWER.get()) { c -> CultFollowerRenderer(c) }
+        event.registerEntityRenderer(ModRegistries.BLOOD_STAIN.get()) { c -> BloodStainsRenderer(c) }
     }
 
-    class CultFollowerRenderer(context: EntityRendererProvider.Context) :
-        MobRenderer<CultFollowerEntity, VillagerModel<CultFollowerEntity>>(
-            context,
-            VillagerModel(context.bakeLayer(ModelLayers.VILLAGER)),
-            0.5f
-        ) {
-
+    class CultFollowerRenderer(context: EntityRendererProvider.Context) : MobRenderer<CultFollowerEntity, VillagerModel<CultFollowerEntity>>(context, VillagerModel(context.bakeLayer(ModelLayers.VILLAGER)), 0.5f) {
         override fun getTextureLocation(entity: CultFollowerEntity): ResourceLocation {
             return ResourceLocation.fromNamespaceAndPath(RitualsAPI.Companion.MODID, "textures/entity/cult_follower.png")
+        }
+    }
+
+    class BloodStainsRenderer(context: EntityRendererProvider.Context) : EntityRenderer<BloodStainEntity>(context) {
+        override fun getTextureLocation(entity: BloodStainEntity): ResourceLocation {
+            TODO("Not yet implemented")
         }
     }
 }

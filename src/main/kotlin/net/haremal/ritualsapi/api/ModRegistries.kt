@@ -2,9 +2,9 @@ package net.haremal.ritualsapi.api
 
 import com.google.common.base.Supplier
 import net.haremal.ritualsapi.RitualsAPI.Companion.MODID
+import net.haremal.ritualsapi.api.entity.BloodStainEntity
 import net.haremal.ritualsapi.api.entity.CultFollowerEntity
 import net.haremal.ritualsapi.api.item.RitualDaggerItem
-import net.minecraft.core.BlockPos
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.registries.Registries
 import net.minecraft.world.entity.EntityType
@@ -16,6 +16,7 @@ import net.neoforged.neoforge.common.DeferredSpawnEggItem
 import net.neoforged.neoforge.registries.DeferredHolder
 import net.neoforged.neoforge.registries.DeferredItem
 import net.neoforged.neoforge.registries.DeferredRegister
+import java.util.UUID
 
 
 object ModRegistries {
@@ -25,6 +26,13 @@ object ModRegistries {
             .sized(0.6f, 1.95f)
             .build("cult_follower")
     })
+    val BLOOD_STAIN: DeferredHolder<EntityType<*>, EntityType<BloodStainEntity>> = ENTITY_TYPES.register("blood_stain", Supplier<EntityType<BloodStainEntity>> {
+        EntityType.Builder.of(::BloodStainEntity, MobCategory.MISC)
+            .sized(0.01f, 0.01f)  // very small hitbox
+            .clientTrackingRange(64)
+            .build("blood_stain")
+    })
+
 
     val ITEMS: DeferredRegister.Items = DeferredRegister.createItems(MODID)
     val RITUAL_DAGGER: DeferredItem<RitualDaggerItem?> = ITEMS.register("ritual_dagger", Supplier {
@@ -43,16 +51,6 @@ object ModRegistries {
 
     val BLOCKS: DeferredRegister.Blocks = DeferredRegister.createBlocks(MODID)
     val CREATIVE_MODE_TABS: DeferredRegister<CreativeModeTab> = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID)
-
-
-    object BloodDataStorage {
-        val bloodPixels = mutableListOf<BloodPixelData>()
-        data class BloodPixelData (
-            val blockPos: Vec3,
-            val pixelPos: Vec3,
-            val color: Triple<Int, Int, Int>
-        )
-    }
 }
 
 
