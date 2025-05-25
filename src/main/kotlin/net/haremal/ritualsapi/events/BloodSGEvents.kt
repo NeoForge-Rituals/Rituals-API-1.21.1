@@ -3,45 +3,72 @@ package net.haremal.ritualsapi.events
 import net.haremal.ritualsapi.RitualsAPI
 import net.haremal.ritualsapi.api.ModRegistries
 import net.haremal.ritualsapi.api.entity.BloodStainEntity
+import net.minecraft.core.BlockPos
 import net.minecraft.resources.ResourceKey
 import net.minecraft.server.level.ServerLevel
-import net.minecraft.world.entity.MobSpawnType
+import net.minecraft.world.effect.MobEffectInstance
+import net.minecraft.world.effect.MobEffects
+import net.minecraft.world.entity.player.Player
+import net.minecraft.world.item.Items
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.BlockHitResult
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
+import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent
+import net.neoforged.neoforge.event.entity.player.UseItemOnBlockEvent
 import net.neoforged.neoforge.event.tick.ServerTickEvent
 import kotlin.collections.forEach
-import kotlin.concurrent.timer
 
 @EventBusSubscriber(modid = RitualsAPI.MODID, bus = EventBusSubscriber.Bus.GAME)
 object BloodSGEvents {
-    // TODO: ONLY WHEN CROUCHING AND ONLY ON THE BLOCK BELOW THE PLAYER (IF THERE IS)
-
     @SubscribeEvent
     fun onServerTick(event: ServerTickEvent.Post) {
-        BloodStainEntity.timer.entries.removeIf { (_, time) -> time <= 0 }
-        BloodStainEntity.timer.forEach { (player, time) ->
-            BloodStainEntity.timer[player] = time - 1
+        BloodStainEntity.bloodDrop.entries.removeIf { (_, data) -> data.timer <= 0 }
+        BloodStainEntity.bloodDrop.forEach { (player, data) ->
+            data.timer = data.timer - 1
+            val ticks = data.chance + (1..10).random()
+            if (ticks < 40) { data.chance = ticks; return@forEach } else data.chance = 0
 
-            val pos = player.position()
+            val posUnder = BlockPos.containing(player.position().x, player.position().y - 0.01, player.position().z)
+            val stateUnder = player.level().getBlockState(posUnder)
+
+            val shape = stateUnder.getCollisionShape(player.level(), posUnder)
+            val isFullBlock = if (shape.isEmpty) false else shape.bounds() == AABB(0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
+
+            val pos = player.position().takeIf { !stateUnder.isAir && isFullBlock} ?: return@forEach
+
             val box = AABB(
-                pos.x - 0.2, pos.y - 0.2, pos.z - 0.2,
-                pos.x + 0.2, pos.y + 0.2, pos.z + 0.2
+                pos.x - 0.05, pos.y - 0.1, pos.z - 0.05,
+                pos.x + 0.05, pos.y + 0.1, pos.z + 0.05
             )
             val nearby = player.level().getEntitiesOfClass(BloodStainEntity::class.java, box)
 
             if (nearby.isEmpty()) {
                 val dimKey: ResourceKey<Level> = player.level().dimension()  // the player’s current dimension key
-                val serverLevel: ServerLevel = event.server.getLevel(dimKey)?: return
+                val serverLevel: ServerLevel = event.server.getLevel(dimKey)?: return@forEach
                 val stainType = ModRegistries.BLOOD_STAIN.get() ?: return@forEach
-                println("Spawning blood stain in ${dimKey.location()}")
-
                 stainType.create(serverLevel).let { stain ->
                     stain?.setPos(player.position())
                     if (stain != null) serverLevel.addFreshEntity(stain)
                 }
             }
+        }
+    }
+
+    @SubscribeEvent
+    fun onUseItem(event: LivingEntityUseItemEvent.Tick){
+        val player = event.entity
+        if (event.item.item == Items.BRUSH && player is Player && !player.level().isClientSide) {
+            val hit = player.pick(5.0, 0f, false)
+            val pos = hit.location
+            val range = 0.1
+            val box = AABB(
+                pos.x - range, pos.y, pos.z - range,
+                pos.x + range, pos.y + range, pos.z + range
+            )
+            val entities = player.level().getEntitiesOfClass(BloodStainEntity::class.java, box)
+            entities.firstOrNull()?.discard()
         }
     }
 }
