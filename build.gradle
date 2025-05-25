@@ -21,6 +21,10 @@ repositories {
         name = "Kotlin for Forge"
         setUrl("https://thedarkcolour.github.io/KotlinForForge/")
     }
+    maven {
+        name = "GeckoLib"
+        url = "https://dl.cloudsmith.io/public/geckolib3/geckolib/maven/"
+    }
 }
 
 base {
@@ -60,9 +64,14 @@ configurations {
     runtimeClasspath.extendsFrom localRuntime
 }
 
+jarJar.enable()
+
 dependencies {
     implementation "net.neoforged:neoforge:${neo_version}"
     implementation("thedarkcolour:kotlinforforge-neoforge:$kff_version")
+    implementation("software.bernie.geckolib:geckolib-neoforge-1.21.1:4.7.5.1")
+    jarJar(group: 'software.bernie.geckolib', name: 'geckolib-neoforge-1.21.1', version: '4.7.5.1')
+
 }
 
 tasks.withType(ProcessResources).configureEach {

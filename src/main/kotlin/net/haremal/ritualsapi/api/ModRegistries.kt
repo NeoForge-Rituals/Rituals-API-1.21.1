@@ -26,13 +26,12 @@ object ModRegistries {
             .sized(0.6f, 1.95f)
             .build("cult_follower")
     })
-    val BLOOD_STAIN: DeferredHolder<EntityType<*>, EntityType<BloodStainEntity>> = ENTITY_TYPES.register("blood_stain", Supplier<EntityType<BloodStainEntity>> {
+    val BLOOD_STAIN: DeferredHolder<EntityType<*>?, EntityType<BloodStainEntity>?> = ENTITY_TYPES.register("blood_stain", Supplier {
         EntityType.Builder.of(::BloodStainEntity, MobCategory.MISC)
-            .sized(0.01f, 0.01f)  // very small hitbox
+            .sized(0.5f, 0.05f)
             .clientTrackingRange(64)
             .build("blood_stain")
     })
-
 
     val ITEMS: DeferredRegister.Items = DeferredRegister.createItems(MODID)
     val RITUAL_DAGGER: DeferredItem<RitualDaggerItem?> = ITEMS.register("ritual_dagger", Supplier {
@@ -43,8 +42,8 @@ object ModRegistries {
     val CULT_FOLLOWER_SPAWN_EGG: DeferredItem<DeferredSpawnEggItem> = ITEMS.register("cult_follower_spawn_egg", Supplier<DeferredSpawnEggItem> {
         DeferredSpawnEggItem(
             CULT_FOLLOWER,
-            0x444444, // base color
-            0x880000, // spot color
+            0x444444,
+            0x880000,
             Item.Properties()
         )
     })
