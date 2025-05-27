@@ -1,14 +1,12 @@
-package net.haremal.ritualsapi.api
+package net.haremal.ritualsapi
 
 import com.google.common.base.Supplier
-import net.haremal.ritualsapi.RitualsAPI
 import net.haremal.ritualsapi.RitualsAPI.Companion.MODID
-import net.haremal.ritualsapi.api.debug.DebugWand
-import net.haremal.ritualsapi.api.registries.AltarBlock
-import net.haremal.ritualsapi.api.registries.AltarBlock.AltarBlockEntity
-import net.haremal.ritualsapi.api.registries.BloodStainEntity
-import net.haremal.ritualsapi.api.registries.CultFollowerEntity
-import net.haremal.ritualsapi.api.registries.RitualDaggerItem
+import net.haremal.ritualsapi.debug.DebugWand
+import net.haremal.ritualsapi.rituals.AltarBlock
+import net.haremal.ritualsapi.rituals.BloodStainEntity
+import net.haremal.ritualsapi.cults.CultFollowerEntity
+import net.haremal.ritualsapi.rituals.RitualDaggerItem
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.registries.Registries
 import net.minecraft.network.chat.Component
@@ -52,8 +50,8 @@ object ModRegistries {
             AltarBlock(Properties.of().strength(3.0f).noOcclusion())
         })
     val BLOCK_ENTITY_TYPES: DeferredRegister<BlockEntityType<*>> = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, MODID)
-        val ALTAR_BLOCK_ENTITY: DeferredHolder<BlockEntityType<*>?, BlockEntityType<AltarBlockEntity?>?> = BLOCK_ENTITY_TYPES.register("altar_block_entity", Supplier {
-            BlockEntityType.Builder.of(::AltarBlockEntity, ALTAR_BLOCK.get()).build(null)
+        val ALTAR_BLOCK_ENTITY: DeferredHolder<BlockEntityType<*>?, BlockEntityType<AltarBlock.AltarBlockEntity?>?> = BLOCK_ENTITY_TYPES.register("altar_block_entity", Supplier {
+            BlockEntityType.Builder.of(AltarBlock::AltarBlockEntity, ALTAR_BLOCK.get()).build(null)
         })
 
 

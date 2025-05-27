@@ -1,8 +1,8 @@
-package net.haremal.ritualsapi.network
+package net.haremal.ritualsapi.network_to_remove
 
 import io.netty.buffer.ByteBuf
 import net.haremal.ritualsapi.RitualsAPI
-import net.haremal.ritualsapi.api.cults.Cult
+import net.haremal.ritualsapi.cults.Cult
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload
 import net.minecraft.resources.ResourceLocation

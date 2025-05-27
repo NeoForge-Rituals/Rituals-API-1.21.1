@@ -1,9 +1,7 @@
-package net.haremal.ritualsapi.events
+package net.haremal.ritualsapi.debug
 
 import net.haremal.ritualsapi.RitualsAPI
-import net.haremal.ritualsapi.api.debug.DebugWand
-import net.haremal.ritualsapi.api.registries.AltarBlock
-import net.haremal.ritualsapi.network.SyncDebugBoxesPacket
+import net.haremal.ritualsapi.network_to_remove.SyncDebugBoxesPacket
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.LevelRenderer
 import net.minecraft.client.renderer.RenderType
@@ -11,10 +9,10 @@ import net.neoforged.api.distmarker.Dist
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent
+import kotlin.collections.iterator
 
-
-@EventBusSubscriber(modid = RitualsAPI.MODID, bus = EventBusSubscriber.Bus.GAME, value = [Dist.CLIENT])
-object DebugCGEvents {
+@EventBusSubscriber(modid = RitualsAPI.Companion.MODID, bus = EventBusSubscriber.Bus.GAME, value = [Dist.CLIENT])
+object DebugEventsCG {
 
     @SubscribeEvent
     fun onRenderLevelStage(event: RenderLevelStageEvent) {

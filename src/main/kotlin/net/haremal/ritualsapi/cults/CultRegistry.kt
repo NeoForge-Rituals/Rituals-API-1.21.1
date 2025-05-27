@@ -1,4 +1,4 @@
-package net.haremal.ritualsapi.api.cults
+package net.haremal.ritualsapi.cults
 
 import net.minecraft.resources.ResourceLocation
 

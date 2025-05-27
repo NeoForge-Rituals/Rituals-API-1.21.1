@@ -1,17 +1,17 @@
-package net.haremal.ritualsapi.api.debug
+package net.haremal.ritualsapi.debug
 
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.suggestion.SuggestionProvider
-import net.haremal.ritualsapi.api.cults.CultMemberManager
-import net.haremal.ritualsapi.api.cults.CultRegistry
+import net.haremal.ritualsapi.cults.CultMemberManager
+import net.haremal.ritualsapi.cults.CultRegistry
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.Commands
 import net.minecraft.commands.arguments.ResourceLocationArgument
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
 
-object CultCommand {
+object DebugCommands {
     fun register(dispatcher: CommandDispatcher<CommandSourceStack>) {
         dispatcher.register(
             Commands.literal("cult")

@@ -1,7 +1,6 @@
-package net.haremal.ritualsapi.api.cults
+package net.haremal.ritualsapi.cults
 
-import net.haremal.ritualsapi.api.rituals.RitualSigilMatcher.makeSigil
-import net.haremal.ritualsapi.network.SyncEnergyPacket
+import net.haremal.ritualsapi.network_to_remove.SyncEnergyPacket
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerLevel

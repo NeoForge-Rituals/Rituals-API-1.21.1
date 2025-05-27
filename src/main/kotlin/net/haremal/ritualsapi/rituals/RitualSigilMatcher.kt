@@ -1,7 +1,6 @@
-package net.haremal.ritualsapi.api.rituals
+package net.haremal.ritualsapi.rituals
 
-import net.haremal.ritualsapi.api.registries.BloodStainEntity
-import net.haremal.ritualsapi.network.SyncDebugBoxesPacket
+import net.haremal.ritualsapi.network_to_remove.SyncDebugBoxesPacket
 import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.level.Level

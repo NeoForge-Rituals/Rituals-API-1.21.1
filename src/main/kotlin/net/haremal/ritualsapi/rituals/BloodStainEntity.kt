@@ -1,4 +1,4 @@
-package net.haremal.ritualsapi.api.registries
+package net.haremal.ritualsapi.rituals
 
 import net.minecraft.nbt.CompoundTag
 import net.minecraft.network.syncher.SynchedEntityData

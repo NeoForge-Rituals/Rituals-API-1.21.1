@@ -1,4 +1,4 @@
-package net.haremal.ritualsapi.api.registries
+package net.haremal.ritualsapi.rituals
 
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResultHolder

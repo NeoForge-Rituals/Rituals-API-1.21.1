@@ -1,4 +1,4 @@
-package net.haremal.ritualsapi.network
+package net.haremal.ritualsapi.network_to_remove
 
 import net.neoforged.neoforge.network.handling.IPayloadContext
 

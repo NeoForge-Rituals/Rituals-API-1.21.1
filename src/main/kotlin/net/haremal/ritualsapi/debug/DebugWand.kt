@@ -1,14 +1,6 @@
-package net.haremal.ritualsapi.api.debug
+package net.haremal.ritualsapi.debug
 
-import net.haremal.ritualsapi.RitualsAPI
-import net.haremal.ritualsapi.api.rituals.RitualSigilMatcher
-import net.haremal.ritualsapi.api.rituals.RitualSigilMatcher.makeSigil
-import net.haremal.ritualsapi.events.DebugCGEvents
-import net.haremal.ritualsapi.network.SyncDebugBoxesPacket
-import net.minecraft.world.InteractionHand
-import net.minecraft.world.InteractionResultHolder
 import net.minecraft.world.entity.Entity
-import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Item
 import net.minecraft.world.item.ItemStack

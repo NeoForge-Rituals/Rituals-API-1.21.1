@@ -1,15 +1,12 @@
-package net.haremal.ritualsapi.network
+package net.haremal.ritualsapi.network_to_remove
 
-import io.netty.buffer.ByteBuf
 import net.haremal.ritualsapi.RitualsAPI
 import net.minecraft.core.BlockPos
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.phys.AABB
-import net.neoforged.neoforge.network.PacketDistributor
 
 data class SyncDebugBoxesPacket(val boxesByPos: Map<BlockPos, List<AABB>>) : CustomPacketPayload {
 

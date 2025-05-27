@@ -1,17 +1,21 @@
-package net.haremal.ritualsapi.api.registries
+package net.haremal.ritualsapi.cults
 
 import net.minecraft.util.TimeUtil
 import net.minecraft.util.valueproviders.UniformInt
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.NeutralMob
 import net.minecraft.world.entity.PathfinderMob
-import net.minecraft.world.entity.ai.goal.*
+import net.minecraft.world.entity.ai.goal.FloatGoal
+import net.minecraft.world.entity.ai.goal.LookAtPlayerGoal
+import net.minecraft.world.entity.ai.goal.MeleeAttackGoal
+import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal
+import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal
 import net.minecraft.world.entity.ai.goal.target.HurtByTargetGoal
 import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal
 import net.minecraft.world.entity.ai.goal.target.ResetUniversalAngerTargetGoal
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.Level
-import java.util.*
+import java.util.UUID
 
 class CultFollowerEntity(type: EntityType<CultFollowerEntity>, level: Level) : PathfinderMob(type, level), NeutralMob {
     companion object { private val PERSISTENT_ANGER_TIME: UniformInt = TimeUtil.rangeOfSeconds(30, 60) }

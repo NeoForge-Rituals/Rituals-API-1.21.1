@@ -1,17 +1,31 @@
-package net.haremal.ritualsapi.events
+package net.haremal.ritualsapi.cults
 
+import net.haremal.ritualsapi.ModRegistries
 import net.haremal.ritualsapi.RitualsAPI
-import net.haremal.ritualsapi.api.ModRegistries
+import net.haremal.ritualsapi.debug.ExampleCult
+import net.haremal.ritualsapi.rituals.RitualSigilMatcher.makeSigil
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.Mob
 import net.minecraft.world.entity.ai.attributes.Attributes
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent
 import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent
 
-@EventBusSubscriber(modid = RitualsAPI.Companion.MODID, bus = EventBusSubscriber.Bus.MOD)
-object EntitySMEvents {
+@EventBusSubscriber(modid = RitualsAPI.MODID, bus = EventBusSubscriber.Bus.MOD)
+
+object CultEventsSM {
+    @SubscribeEvent
+    fun onCommonSetup(event: FMLCommonSetupEvent) {
+        event.enqueueWork {
+            CultRegistry.cults.forEach { makeSigil(it.value.cultSigilGet()) }
+        }
+
+        // EXAMPLE
+        CultRegistry.register(ExampleCult)
+    }
+
     @SubscribeEvent
     fun onEntityAttributes(event: EntityAttributeCreationEvent) {
         event.put(

@@ -1,6 +1,6 @@
-package net.haremal.ritualsapi.api.debug
+package net.haremal.ritualsapi.debug
 
-import net.haremal.ritualsapi.api.cults.Cult
+import net.haremal.ritualsapi.cults.Cult
 import net.minecraft.network.chat.Component
 import net.minecraft.world.item.Items
 import net.minecraft.resources.ResourceLocation

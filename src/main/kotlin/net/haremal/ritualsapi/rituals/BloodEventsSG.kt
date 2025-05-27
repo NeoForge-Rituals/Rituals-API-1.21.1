@@ -1,8 +1,7 @@
-package net.haremal.ritualsapi.events
+package net.haremal.ritualsapi.rituals
 
+import net.haremal.ritualsapi.ModRegistries
 import net.haremal.ritualsapi.RitualsAPI
-import net.haremal.ritualsapi.api.ModRegistries
-import net.haremal.ritualsapi.api.registries.BloodStainEntity
 import net.minecraft.core.BlockPos
 import net.minecraft.resources.ResourceKey
 import net.minecraft.server.level.ServerLevel
@@ -14,14 +13,13 @@ import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent
 import net.neoforged.neoforge.event.tick.ServerTickEvent
-import kotlin.collections.forEach
 
-@EventBusSubscriber(modid = RitualsAPI.MODID, bus = EventBusSubscriber.Bus.GAME)
-object BloodSGEvents {
+@EventBusSubscriber(modid = RitualsAPI.Companion.MODID, bus = EventBusSubscriber.Bus.GAME)
+object BloodEventsSG {
     @SubscribeEvent
     fun onServerTick(event: ServerTickEvent.Post) {
-        BloodStainEntity.bloodDrop.entries.removeIf { (_, data) -> data.timer <= 0 }
-        BloodStainEntity.bloodDrop.forEach { (player, data) ->
+        BloodStainEntity.Companion.bloodDrop.entries.removeIf { (_, data) -> data.timer <= 0 }
+        BloodStainEntity.Companion.bloodDrop.forEach { (player, data) ->
             data.timer = data.timer - 1
             val ticks = data.chance + (1..10).random()
             if (ticks < 40) { data.chance = ticks; return@forEach } else data.chance = 0
