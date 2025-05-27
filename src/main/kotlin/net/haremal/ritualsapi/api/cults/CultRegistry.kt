@@ -3,7 +3,7 @@ package net.haremal.ritualsapi.api.cults
 import net.minecraft.resources.ResourceLocation
 
 object CultRegistry {
-    private val cults: MutableMap<ResourceLocation, Cult> = mutableMapOf()
+    val cults: MutableMap<ResourceLocation, Cult> = mutableMapOf()
 
     fun register(newCult: Cult) {
         require(cults.putIfAbsent(newCult.id, newCult) == null) {

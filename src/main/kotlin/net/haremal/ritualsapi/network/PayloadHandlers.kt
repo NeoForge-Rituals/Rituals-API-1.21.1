@@ -13,4 +13,16 @@ object PayloadHandlers {
             SyncCultPacket.ClientCultCache.id = data.cultId
         }
     }
+    fun clientHandleDebugBoxes(data: SyncDebugBoxesPacket, context: IPayloadContext) {
+        context.enqueueWork {
+            val current = SyncDebugBoxesPacket.DebugBoxesCache.boxesByPos.toMutableMap()
+
+            for ((pos, boxes) in data.boxesByPos) {
+                current[pos] = (current[pos] ?: emptyList()) + boxes
+            }
+
+            SyncDebugBoxesPacket.DebugBoxesCache.boxesByPos = current
+        }
+    }
+
 }

@@ -1,5 +1,6 @@
 package net.haremal.ritualsapi.api.cults
 
+import net.haremal.ritualsapi.api.rituals.RitualSigilMatcher.makeSigil
 import net.haremal.ritualsapi.network.SyncEnergyPacket
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.resources.ResourceLocation
@@ -32,9 +33,8 @@ abstract class Cult (
     }
 
     // Variables
+    abstract fun cultSigilGet(): Array<IntArray>
     open fun joinReason( player: ServerPlayer): Boolean = false
     open fun magicSourceEnergy(player: ServerPlayer) { callWithEnergy(player){true}}
-    protected fun callWithEnergy(player: ServerPlayer, logic: () -> Boolean) {
-        magicEnergy.takeIf { it < 100 }?.let { if (logic()) magicEnergy++ }
-    }
+    protected fun callWithEnergy(player: ServerPlayer, logic: () -> Boolean) { magicEnergy.takeIf { it < 100 }?.let { if (logic()) magicEnergy++ } }
 }

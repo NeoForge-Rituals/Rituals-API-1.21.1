@@ -1,4 +1,4 @@
-package net.haremal.ritualsapi.debug
+package net.haremal.ritualsapi.api.debug
 
 import net.haremal.ritualsapi.api.cults.Cult
 import net.minecraft.network.chat.Component
@@ -6,7 +6,6 @@ import net.minecraft.world.item.Items
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.item.ItemStack
-import org.openjdk.nashorn.internal.objects.NativeError.printStackTrace
 import java.awt.Color
 
 object ExampleCult : Cult(
@@ -30,4 +29,17 @@ object ExampleCult : Cult(
             true
         }
     }
+
+    override fun cultSigilGet(): Array<IntArray> = arrayOf(
+        intArrayOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 1),
+        intArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+        intArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+        intArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+        intArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+        intArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+        intArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+        intArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+        intArrayOf(0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+        intArrayOf(1, 0, 0, 0, 0, 0, 0, 0, 0, 1)
+    )
 }

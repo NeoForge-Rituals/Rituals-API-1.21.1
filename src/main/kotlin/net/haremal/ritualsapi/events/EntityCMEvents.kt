@@ -1,20 +1,11 @@
 package net.haremal.ritualsapi.events
 
-import com.mojang.blaze3d.vertex.BufferUploader
-import com.mojang.blaze3d.vertex.DefaultVertexFormat
-import com.mojang.blaze3d.vertex.PoseStack
-import com.mojang.blaze3d.vertex.Tesselator
-import com.mojang.blaze3d.vertex.VertexConsumer
-import com.mojang.blaze3d.vertex.VertexFormat
 import net.haremal.ritualsapi.RitualsAPI
 import net.haremal.ritualsapi.api.ModRegistries
-import net.haremal.ritualsapi.api.entity.BloodStainEntity
-import net.haremal.ritualsapi.api.entity.CultFollowerEntity
+import net.haremal.ritualsapi.api.registries.BloodStainEntity
+import net.haremal.ritualsapi.api.registries.CultFollowerEntity
 import net.minecraft.client.model.VillagerModel
 import net.minecraft.client.model.geom.ModelLayers
-import net.minecraft.client.renderer.MultiBufferSource
-import net.minecraft.client.renderer.RenderType
-import net.minecraft.client.renderer.entity.EntityRenderer
 import net.minecraft.client.renderer.entity.EntityRendererProvider
 import net.minecraft.client.renderer.entity.MobRenderer
 import net.minecraft.resources.ResourceLocation
@@ -30,8 +21,8 @@ import software.bernie.geckolib.renderer.GeoEntityRenderer
 object EntityCMEvents {
     @SubscribeEvent
     fun onRegisterRenderers(event: EntityRenderersEvent.RegisterRenderers) {
-        event.registerEntityRenderer(ModRegistries.CULT_FOLLOWER.get()) { c -> CultFollowerRenderer(c) }
-        event.registerEntityRenderer(ModRegistries.BLOOD_STAIN.get()) { c -> BloodStainsRenderer(c) }
+        event.registerEntityRenderer(ModRegistries.CULT_FOLLOWER_ENTITY.get()) { c -> CultFollowerRenderer(c) }
+        event.registerEntityRenderer(ModRegistries.BLOOD_STAIN_ENTITY.get()) { c -> BloodStainsRenderer(c) }
     }
 
     class CultFollowerRenderer(context: EntityRendererProvider.Context) : MobRenderer<CultFollowerEntity, VillagerModel<CultFollowerEntity>>(context, VillagerModel(context.bakeLayer(ModelLayers.VILLAGER)), 0.5f) {

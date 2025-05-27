@@ -2,21 +2,17 @@ package net.haremal.ritualsapi.events
 
 import net.haremal.ritualsapi.RitualsAPI
 import net.haremal.ritualsapi.api.ModRegistries
-import net.haremal.ritualsapi.api.entity.BloodStainEntity
+import net.haremal.ritualsapi.api.registries.BloodStainEntity
 import net.minecraft.core.BlockPos
 import net.minecraft.resources.ResourceKey
 import net.minecraft.server.level.ServerLevel
-import net.minecraft.world.effect.MobEffectInstance
-import net.minecraft.world.effect.MobEffects
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Items
 import net.minecraft.world.level.Level
 import net.minecraft.world.phys.AABB
-import net.minecraft.world.phys.BlockHitResult
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent
-import net.neoforged.neoforge.event.entity.player.UseItemOnBlockEvent
 import net.neoforged.neoforge.event.tick.ServerTickEvent
 import kotlin.collections.forEach
 
@@ -47,7 +43,7 @@ object BloodSGEvents {
             if (nearby.isEmpty()) {
                 val dimKey: ResourceKey<Level> = player.level().dimension()  // the player’s current dimension key
                 val serverLevel: ServerLevel = event.server.getLevel(dimKey)?: return@forEach
-                val stainType = ModRegistries.BLOOD_STAIN.get() ?: return@forEach
+                val stainType = ModRegistries.BLOOD_STAIN_ENTITY.get() ?: return@forEach
                 stainType.create(serverLevel).let { stain ->
                     stain?.setPos(player.position())
                     if (stain != null) serverLevel.addFreshEntity(stain)

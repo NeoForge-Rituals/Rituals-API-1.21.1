@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/handheld",
   "textures": {
-    "layer0": "ritualsapi:item/ritual_dagger"
+    "layer0": "ritualsapi:item/debug_wand"
   }
 }

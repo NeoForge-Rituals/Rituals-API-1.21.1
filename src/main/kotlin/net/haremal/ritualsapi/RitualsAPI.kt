@@ -1,9 +1,11 @@
 package net.haremal.ritualsapi
 
 import net.haremal.ritualsapi.api.cults.CultRegistry
-import net.haremal.ritualsapi.debug.ExampleCult
-import net.haremal.ritualsapi.debug.CultCommand
+import net.haremal.ritualsapi.api.debug.ExampleCult
+import net.haremal.ritualsapi.api.debug.CultCommand
 import net.haremal.ritualsapi.api.ModRegistries.BLOCKS
+import net.haremal.ritualsapi.api.ModRegistries.BLOCK_ENTITY_TYPES
+import net.haremal.ritualsapi.api.ModRegistries.BLOCK_ITEMS
 import net.haremal.ritualsapi.api.ModRegistries.CREATIVE_MODE_TABS
 import net.haremal.ritualsapi.api.ModRegistries.ENTITY_TYPES
 import net.haremal.ritualsapi.api.ModRegistries.ITEMS
@@ -22,21 +24,18 @@ class RitualsAPI {
     }
 
     constructor(modEventBus: IEventBus, modContainer: ModContainer) {
-        modEventBus.addListener(::onCommonSetup)
         NeoForge.EVENT_BUS.register(this)
 
         // DEFAULT
-        BLOCKS.register(modEventBus)
-        ITEMS.register(modEventBus)
-        CREATIVE_MODE_TABS.register(modEventBus)
         ENTITY_TYPES.register(modEventBus)
+        ITEMS.register(modEventBus)
+        BLOCKS.register(modEventBus)
+        BLOCK_ENTITY_TYPES.register(modEventBus)
+        BLOCK_ITEMS.register(modEventBus)
+        CREATIVE_MODE_TABS.register(modEventBus)
 
         // API
         CultRegistry.init()
-    }
-
-    private fun onCommonSetup(event: FMLCommonSetupEvent) {
-        CultRegistry.register(ExampleCult)
     }
 
     // DEBUG COMMANDS

@@ -15,7 +15,7 @@ object EntitySMEvents {
     @SubscribeEvent
     fun onEntityAttributes(event: EntityAttributeCreationEvent) {
         event.put(
-            ModRegistries.CULT_FOLLOWER.get() as EntityType<out LivingEntity?>,
+            ModRegistries.CULT_FOLLOWER_ENTITY.get() as EntityType<out LivingEntity?>,
             Mob.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 20.0)
                 .add(Attributes.MOVEMENT_SPEED, 0.25)

@@ -3,6 +3,7 @@ package net.haremal.ritualsapi.events
 import net.haremal.ritualsapi.RitualsAPI
 import net.haremal.ritualsapi.network.PayloadHandlers
 import net.haremal.ritualsapi.network.SyncCultPacket
+import net.haremal.ritualsapi.network.SyncDebugBoxesPacket
 import net.haremal.ritualsapi.network.SyncEnergyPacket
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
@@ -27,6 +28,13 @@ object NetworkSMEvents {
             SyncCultPacket.Companion.STREAM_CODEC,
             DirectionalPayloadHandler(
                 PayloadHandlers::clientHandleCultPacket
+            ) { _, _ -> }
+        )
+        registrar.playBidirectional(
+            SyncDebugBoxesPacket.TYPE,
+            SyncDebugBoxesPacket.STREAM_CODEC,
+            DirectionalPayloadHandler(
+                PayloadHandlers::clientHandleDebugBoxes
             ) { _, _ -> }
         )
     }

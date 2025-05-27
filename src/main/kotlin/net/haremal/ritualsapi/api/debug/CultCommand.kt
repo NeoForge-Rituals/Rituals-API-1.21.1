@@ -1,9 +1,8 @@
-package net.haremal.ritualsapi.debug
+package net.haremal.ritualsapi.api.debug
 
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.suggestion.SuggestionProvider
-import net.haremal.ritualsapi.api.cults.Cult
 import net.haremal.ritualsapi.api.cults.CultMemberManager
 import net.haremal.ritualsapi.api.cults.CultRegistry
 import net.minecraft.commands.CommandSourceStack

@@ -13,7 +13,7 @@ import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.client.event.RenderGuiEvent
 
-@EventBusSubscriber(modid = RitualsAPI.Companion.MODID, bus = EventBusSubscriber.Bus.GAME, value = [Dist.CLIENT])
+@EventBusSubscriber(modid = RitualsAPI.MODID, bus = EventBusSubscriber.Bus.GAME, value = [Dist.CLIENT])
 object CultCGEvents {
     private val CULT_BAR_TEXTURE = ResourceLocation.fromNamespaceAndPath(RitualsAPI.Companion.MODID,"textures/gui/cult_bar.png")
 
