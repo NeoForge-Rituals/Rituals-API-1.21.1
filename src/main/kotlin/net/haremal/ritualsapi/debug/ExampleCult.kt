@@ -14,8 +14,6 @@ object ExampleCult : Cult(
     "Devoted to void rituals",
     Color(0x000020), Color(0x626262)
 ) {
-    override fun onJoin(player: ServerPlayer) {}
-
     override fun joinReason(player: ServerPlayer): Boolean {
         return player.inventory.contains(Items.STONE.defaultInstance)
     }

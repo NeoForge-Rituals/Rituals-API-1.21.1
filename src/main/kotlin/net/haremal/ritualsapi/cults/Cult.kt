@@ -13,11 +13,22 @@ abstract class Cult (
     val maincolor: Color,
     val seccolor: Color
 ) {
+    companion object CultRegistry {
+        val cults: MutableMap<ResourceLocation, Cult> = mutableMapOf()
+
+        fun register(newCult: Cult) {
+            require(cults.putIfAbsent(newCult.id, newCult) == null) {
+                "Can't register a cult: ID '${newCult.id}' is already"
+            }
+        }
+        fun get(id: ResourceLocation): Cult? = cults[id]
+        fun all(): Collection<Cult> = cults.values
+        fun init() {}
+    }
+
     private var lastSyncedEnergy = -1
     var magicEnergy: Int = 0
 
-    // Default
-    abstract fun onJoin(player: ServerPlayer)
     open fun onTick(world: ServerLevel) {
         world.players().forEach { player ->
             if (!player.level().isClientSide && CultMemberManager.getCult(player)?.id == id) {
@@ -30,9 +41,9 @@ abstract class Cult (
         }
     }
 
-    // Variables
     abstract fun cultSigilGet(): Array<IntArray>
     open fun joinReason( player: ServerPlayer): Boolean = false
     open fun magicSourceEnergy(player: ServerPlayer) { callWithEnergy(player){true}}
     protected fun callWithEnergy(player: ServerPlayer, logic: () -> Boolean) { magicEnergy.takeIf { it < 100 }?.let { if (logic()) magicEnergy++ } }
 }
+

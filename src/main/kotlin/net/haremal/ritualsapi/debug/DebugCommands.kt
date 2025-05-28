@@ -3,13 +3,16 @@ package net.haremal.ritualsapi.debug
 import com.mojang.brigadier.CommandDispatcher
 import com.mojang.brigadier.builder.LiteralArgumentBuilder
 import com.mojang.brigadier.suggestion.SuggestionProvider
+import net.haremal.ritualsapi.cults.Cult
 import net.haremal.ritualsapi.cults.CultMemberManager
-import net.haremal.ritualsapi.cults.CultRegistry
 import net.minecraft.commands.CommandSourceStack
 import net.minecraft.commands.Commands
+import net.minecraft.commands.arguments.EntityArgument
 import net.minecraft.commands.arguments.ResourceLocationArgument
 import net.minecraft.network.chat.Component
 import net.minecraft.server.level.ServerPlayer
+import net.minecraft.world.entity.LivingEntity
+import java.util.function.Supplier
 
 object DebugCommands {
     fun register(dispatcher: CommandDispatcher<CommandSourceStack>) {
@@ -22,59 +25,66 @@ object DebugCommands {
     }
 
     private val SUGGEST_CULTS = SuggestionProvider<CommandSourceStack> { ctx, builder ->
-        val availableCults = CultRegistry.all()
+        val availableCults = Cult.all()
         for (cult in availableCults) {
             builder.suggest(cult.id.toString())
         }
         builder.buildFuture()
     }
 
-    private fun join(): LiteralArgumentBuilder<CommandSourceStack?>? {
+    private fun join(): LiteralArgumentBuilder<CommandSourceStack> {
         return Commands.literal("join")
             .then(
-                Commands.argument("cultId", ResourceLocationArgument.id())
-                    .suggests(SUGGEST_CULTS)  // Add tab-completion here
-                    .executes { ctx ->
-                        val player = ctx.source.entity as? ServerPlayer ?: return@executes 0
-                        val cultId = ResourceLocationArgument.getId(ctx, "cultId")
+                Commands.argument("target", EntityArgument.entity()) // exactly one entity (player or non-player)
+                    .then(
+                        Commands.argument("cultId", ResourceLocationArgument.id())
+                            .suggests(SUGGEST_CULTS)
+                            .executes { ctx ->
+                                val entity = EntityArgument.getEntity(ctx, "target")
+                                val cultId = ResourceLocationArgument.getId(ctx, "cultId")
+                                val cult = Cult.get(cultId)
+                                if (cult == null) {
+                                    ctx.source.sendFailure(Component.literal("Cult '$cultId' does not exist."))
+                                    return@executes 1
+                                }
+                                CultMemberManager.joinCult(entity as LivingEntity, cult)
+                                ctx.source.sendSystemMessage(Component.literal("${entity.name} joined the cult: ${cult.name}"))
+                                1
+                            }
+                    )
+            )
+    }
 
-                        // Check if a cult exists
-                        val cult = CultRegistry.get(cultId)
-                        if (cult == null) {
-                            player.sendSystemMessage(Component.literal("Cult '$cultId' does not exist."))
-                            return@executes 1
-                        }
-                        // Join the cult
-                        CultMemberManager.joinCult(player, cult)
-                        cult.onJoin(player)
-                        player.sendSystemMessage(Component.literal("You have joined the cult: ${cult.name}"))
+    private fun leave(): LiteralArgumentBuilder<CommandSourceStack> {
+        return Commands.literal("leave")
+            .then(
+                Commands.argument("target", EntityArgument.player()) // exactly one player
+                    .executes { ctx ->
+                        val player = EntityArgument.getPlayer(ctx, "target")
+                        CultMemberManager.leaveCult(player)
+                        ctx.source.sendSystemMessage(Component.literal("${player.name} has left the cult."))
                         1
                     }
             )
     }
 
-
-    private fun leave(): LiteralArgumentBuilder<CommandSourceStack?>? {
-        return Commands.literal("leave")
-            .executes { ctx ->
-                val player = ctx.source.entity as? ServerPlayer ?: return@executes 0
-                CultMemberManager.leaveCult(player)
-                player.sendSystemMessage(Component.literal("You have left your cult."))
-                1
-            }
-    }
-
-    private fun info(): LiteralArgumentBuilder<CommandSourceStack?>? {
+    private fun info(): LiteralArgumentBuilder<CommandSourceStack> {
         return Commands.literal("info")
-            .executes { ctx ->
-                val player = ctx.source.entity as? ServerPlayer ?: return@executes 0
-                val cultId = CultMemberManager.getCult(player)
-                if (cultId != null) {
-                    player.sendSystemMessage(Component.literal("You are a member of the cult: $cultId"))
-                } else {
-                    player.sendSystemMessage(Component.literal("You are not part of any cult."))
-                }
-                1
-            }
+            .then(
+                Commands.argument("target", EntityArgument.entities()) // allow any entities now
+                    .executes { ctx ->
+                        val targets = EntityArgument.getEntities(ctx, "target")
+                        for (entity in targets) {
+                            val cult = CultMemberManager.getCult(entity as LivingEntity)
+                            if (cult != null) {
+                                ctx.source.sendSystemMessage(Component.literal("${entity.name} is a member of the cult: ${cult.name}"))
+                            } else {
+                                ctx.source.sendSystemMessage(Component.literal("${entity.name} is not part of any cult."))
+                            }
+                        }
+                        1
+                    }
+            )
     }
+
 }

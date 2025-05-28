@@ -1,6 +1,5 @@
 package net.haremal.ritualsapi
 
-import net.haremal.ritualsapi.cults.CultRegistry
 import net.haremal.ritualsapi.debug.DebugCommands
 import net.haremal.ritualsapi.ModRegistries.BLOCKS
 import net.haremal.ritualsapi.ModRegistries.BLOCK_ENTITY_TYPES
@@ -8,6 +7,7 @@ import net.haremal.ritualsapi.ModRegistries.BLOCK_ITEMS
 import net.haremal.ritualsapi.ModRegistries.CREATIVE_MODE_TABS
 import net.haremal.ritualsapi.ModRegistries.ENTITY_TYPES
 import net.haremal.ritualsapi.ModRegistries.ITEMS
+import net.haremal.ritualsapi.cults.Cult
 import net.neoforged.bus.api.IEventBus
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.ModContainer
@@ -33,7 +33,7 @@ class RitualsAPI {
         CREATIVE_MODE_TABS.register(modEventBus)
 
         // API
-        CultRegistry.init()
+        Cult.init()
     }
 
     // DEBUG COMMANDS

@@ -21,7 +21,7 @@ object CultEventsCG {
 
         // Checking if the player is in a cult
         val cultId = SyncCultPacket.ClientCultCache.id ?: return
-        CultRegistry.get(cultId) ?: return
+        Cult.get(cultId) ?: return
         CultMemberManager.getCult() ?: return
 
         // Variables for rendering the bar

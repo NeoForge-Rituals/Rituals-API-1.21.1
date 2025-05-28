@@ -25,4 +25,12 @@ object CultEventsSG {
             }
         }
     }
+
+    @SubscribeEvent
+    fun onClone(e: PlayerEvent.Clone) {
+        if (!e.isWasDeath) return
+        CultMemberManager.getCult(e.original)?.let {
+            CultMemberManager.joinCult(e.entity as ServerPlayer, it)
+        }
+    }
 }

@@ -19,11 +19,11 @@ object CultEventsSM {
     @SubscribeEvent
     fun onCommonSetup(event: FMLCommonSetupEvent) {
         event.enqueueWork {
-            CultRegistry.cults.forEach { makeSigil(it.value.cultSigilGet()) }
+            Cult.cults.forEach { makeSigil(it.value.cultSigilGet()) }
         }
 
         // EXAMPLE
-        CultRegistry.register(ExampleCult)
+        Cult.register(ExampleCult)
     }
 
     @SubscribeEvent
