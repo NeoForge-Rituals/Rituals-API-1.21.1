@@ -1,7 +1,6 @@
 package net.haremal.ritualsapi.cults
 
 import net.haremal.ritualsapi.RitualsAPI
-import net.haremal.ritualsapi.network_to_remove.SyncCultPacket
 import net.minecraft.server.level.ServerLevel
 import net.minecraft.server.level.ServerPlayer
 import net.neoforged.bus.api.SubscribeEvent

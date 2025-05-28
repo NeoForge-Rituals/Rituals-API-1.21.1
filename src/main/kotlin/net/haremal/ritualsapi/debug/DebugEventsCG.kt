@@ -1,7 +1,6 @@
 package net.haremal.ritualsapi.debug
 
 import net.haremal.ritualsapi.RitualsAPI
-import net.haremal.ritualsapi.network_to_remove.SyncDebugBoxesPacket
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.LevelRenderer
 import net.minecraft.client.renderer.RenderType

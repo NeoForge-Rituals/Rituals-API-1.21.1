@@ -2,8 +2,6 @@ package net.haremal.ritualsapi.cults
 
 import com.mojang.blaze3d.systems.RenderSystem
 import net.haremal.ritualsapi.RitualsAPI
-import net.haremal.ritualsapi.network_to_remove.SyncCultPacket
-import net.haremal.ritualsapi.network_to_remove.SyncEnergyPacket
 import net.minecraft.client.Minecraft
 import net.minecraft.resources.ResourceLocation
 import net.neoforged.api.distmarker.Dist

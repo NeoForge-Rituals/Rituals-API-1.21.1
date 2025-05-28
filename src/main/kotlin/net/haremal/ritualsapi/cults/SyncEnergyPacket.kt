@@ -1,14 +1,14 @@
-package net.haremal.ritualsapi.network_to_remove
+package net.haremal.ritualsapi.cults
 
 import io.netty.buffer.ByteBuf
 import net.haremal.ritualsapi.RitualsAPI
-import net.haremal.ritualsapi.cults.CultMemberManager
 import net.minecraft.network.codec.ByteBufCodecs
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
 import net.neoforged.neoforge.network.PacketDistributor
+import net.neoforged.neoforge.network.handling.IPayloadContext
 
 data class SyncEnergyPacket(val cultEnergy: Int): CustomPacketPayload {
     companion object {
@@ -28,5 +28,13 @@ data class SyncEnergyPacket(val cultEnergy: Int): CustomPacketPayload {
 
     object ClientEnergyCache {
         var energy: Int = 0
+    }
+}
+
+object EnergyHandlers {
+    fun clientHandleEnergyPacket(data: SyncEnergyPacket, context: IPayloadContext) {
+        context.enqueueWork {
+            SyncEnergyPacket.ClientEnergyCache.energy = data.cultEnergy
+        }
     }
 }

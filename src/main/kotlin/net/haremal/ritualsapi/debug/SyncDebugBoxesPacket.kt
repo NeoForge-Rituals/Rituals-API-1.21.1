@@ -1,12 +1,16 @@
-package net.haremal.ritualsapi.network_to_remove
+package net.haremal.ritualsapi.debug
 
 import net.haremal.ritualsapi.RitualsAPI
+import net.haremal.ritualsapi.debug.SyncDebugBoxesPacket.DebugBoxesCache
 import net.minecraft.core.BlockPos
 import net.minecraft.network.FriendlyByteBuf
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.phys.AABB
+import net.neoforged.neoforge.network.handling.IPayloadContext
+import kotlin.collections.iterator
+import kotlin.collections.plus
 
 data class SyncDebugBoxesPacket(val boxesByPos: Map<BlockPos, List<AABB>>) : CustomPacketPayload {
 
@@ -78,3 +82,16 @@ data class SyncDebugBoxesPacket(val boxesByPos: Map<BlockPos, List<AABB>>) : Cus
     }
 }
 
+object DebugBoxesHandlers {
+    fun clientHandleDebugBoxes(data: SyncDebugBoxesPacket, context: IPayloadContext) {
+        context.enqueueWork {
+            val current = DebugBoxesCache.boxesByPos.toMutableMap()
+
+            for ((pos, boxes) in data.boxesByPos) {
+                current[pos] = (current[pos] ?: emptyList()) + boxes
+            }
+
+            DebugBoxesCache.boxesByPos = current
+        }
+    }
+}

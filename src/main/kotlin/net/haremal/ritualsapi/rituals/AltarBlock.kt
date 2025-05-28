@@ -14,7 +14,6 @@ import net.minecraft.world.phys.shapes.CollisionContext
 import net.minecraft.world.phys.shapes.VoxelShape
 
 class AltarBlock(properties: Properties) : Block(properties), EntityBlock {
-    // TODO: PUT EVERY PACKET (AND PUT INSIDE PACKET HANDLERS) TO WHAT THEY BELONG TO
     // TODO: IMPLEMENT LOGIC TO ALTAR BLOCK
     override fun getShape(state: BlockState, level: BlockGetter, pos: BlockPos, context: CollisionContext): VoxelShape {
         return super.getShape(state, level, pos, context)

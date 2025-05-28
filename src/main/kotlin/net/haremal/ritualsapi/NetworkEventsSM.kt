@@ -1,6 +1,11 @@
-package net.haremal.ritualsapi.network_to_remove
+package net.haremal.ritualsapi
 
-import net.haremal.ritualsapi.RitualsAPI
+import net.haremal.ritualsapi.cults.CultHandlers
+import net.haremal.ritualsapi.cults.EnergyHandlers
+import net.haremal.ritualsapi.cults.SyncCultPacket
+import net.haremal.ritualsapi.cults.SyncEnergyPacket
+import net.haremal.ritualsapi.debug.DebugBoxesHandlers
+import net.haremal.ritualsapi.debug.SyncDebugBoxesPacket
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent
@@ -16,21 +21,21 @@ object NetworkEventsSM {
             SyncEnergyPacket.Companion.TYPE,
             SyncEnergyPacket.Companion.STREAM_CODEC,
             DirectionalPayloadHandler(
-                PayloadHandlers::clientHandleEnergyPacket
+                EnergyHandlers::clientHandleEnergyPacket
             ) { _, _ -> }
         )
         registrar.playBidirectional(
             SyncCultPacket.Companion.TYPE,
             SyncCultPacket.Companion.STREAM_CODEC,
             DirectionalPayloadHandler(
-                PayloadHandlers::clientHandleCultPacket
+                CultHandlers::clientHandleCultPacket
             ) { _, _ -> }
         )
         registrar.playBidirectional(
-            SyncDebugBoxesPacket.TYPE,
-            SyncDebugBoxesPacket.STREAM_CODEC,
+            SyncDebugBoxesPacket.Companion.TYPE,
+            SyncDebugBoxesPacket.Companion.STREAM_CODEC,
             DirectionalPayloadHandler(
-                PayloadHandlers::clientHandleDebugBoxes
+                DebugBoxesHandlers::clientHandleDebugBoxes
             ) { _, _ -> }
         )
     }

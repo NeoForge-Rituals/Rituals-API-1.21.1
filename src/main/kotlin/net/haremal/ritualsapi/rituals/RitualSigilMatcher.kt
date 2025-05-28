@@ -1,6 +1,6 @@
 package net.haremal.ritualsapi.rituals
 
-import net.haremal.ritualsapi.network_to_remove.SyncDebugBoxesPacket
+import net.haremal.ritualsapi.debug.SyncDebugBoxesPacket
 import net.minecraft.core.BlockPos
 import net.minecraft.server.level.ServerPlayer
 import net.minecraft.world.level.Level

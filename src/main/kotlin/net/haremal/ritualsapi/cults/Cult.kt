@@ -1,6 +1,5 @@
 package net.haremal.ritualsapi.cults
 
-import net.haremal.ritualsapi.network_to_remove.SyncEnergyPacket
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerLevel

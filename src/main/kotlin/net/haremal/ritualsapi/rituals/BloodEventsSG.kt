@@ -30,15 +30,27 @@ object BloodEventsSG {
             val shape = stateUnder.getCollisionShape(player.level(), posUnder)
             val isFullBlock = if (shape.isEmpty) false else shape.bounds() == AABB(0.0, 0.0, 0.0, 1.0, 1.0, 1.0)
 
-            val pos = player.position().takeIf { !stateUnder.isAir && isFullBlock} ?: return@forEach
-
-            val box = AABB(
-                pos.x - 0.05, pos.y - 0.1, pos.z - 0.05,
-                pos.x + 0.05, pos.y + 0.1, pos.z + 0.05
+            val playerPos = player.position().takeIf { !stateUnder.isAir && isFullBlock} ?: return@forEach
+            val playerBox = AABB(
+                playerPos.x - 0.05, playerPos.y - 0.1, playerPos.z - 0.05,
+                playerPos.x + 0.05, playerPos.y + 0.1, playerPos.z + 0.05
             )
-            val nearby = player.level().getEntitiesOfClass(BloodStainEntity::class.java, box)
 
-            if (nearby.isEmpty()) {
+            val bloodStains = player.level().getEntitiesOfClass(BloodStainEntity::class.java, playerBox)
+            var nearby = false
+            for(stain in bloodStains){
+                val stainPos = stain.position()
+                val box = AABB(
+                    stainPos.x - 0.05, stainPos.y - 0.1, stainPos.z - 0.05,
+                    stainPos.x + 0.05, stainPos.y + 0.1, stainPos.z + 0.05
+                )
+                if (playerBox.intersects(box)) {
+                    nearby = true
+                    break
+                }
+            }
+
+            if (!nearby) {
                 val dimKey: ResourceKey<Level> = player.level().dimension()  // the player’s current dimension key
                 val serverLevel: ServerLevel = event.server.getLevel(dimKey)?: return@forEach
                 val stainType = ModRegistries.BLOOD_STAIN_ENTITY.get() ?: return@forEach
@@ -51,7 +63,7 @@ object BloodEventsSG {
     }
 
     @SubscribeEvent
-    fun onUseItem(event: LivingEntityUseItemEvent.Tick){
+    fun onUseRitualDaggerItem(event: LivingEntityUseItemEvent.Tick){
         val player = event.entity
         if (event.item.item == Items.BRUSH && player is Player && !player.level().isClientSide) {
             val hit = player.pick(5.0, 0f, false)

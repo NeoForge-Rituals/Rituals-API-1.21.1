@@ -1,13 +1,13 @@
-package net.haremal.ritualsapi.network_to_remove
+package net.haremal.ritualsapi.cults
 
 import io.netty.buffer.ByteBuf
 import net.haremal.ritualsapi.RitualsAPI
-import net.haremal.ritualsapi.cults.Cult
 import net.minecraft.network.codec.StreamCodec
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.server.level.ServerPlayer
 import net.neoforged.neoforge.network.PacketDistributor
+import net.neoforged.neoforge.network.handling.IPayloadContext
 import java.nio.charset.StandardCharsets
 
 data class SyncCultPacket(val cultId: ResourceLocation?): CustomPacketPayload {
@@ -35,5 +35,13 @@ data class SyncCultPacket(val cultId: ResourceLocation?): CustomPacketPayload {
 
     object ClientCultCache {
         var id: ResourceLocation? = null
+    }
+}
+
+object CultHandlers {
+    fun clientHandleCultPacket(data: SyncCultPacket, context: IPayloadContext) {
+        context.enqueueWork {
+            SyncCultPacket.ClientCultCache.id = data.cultId
+        }
     }
 }
