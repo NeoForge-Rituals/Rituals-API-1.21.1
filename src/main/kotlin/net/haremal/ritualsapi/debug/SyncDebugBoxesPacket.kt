@@ -1,6 +1,7 @@
 package net.haremal.ritualsapi.debug
 
 import net.haremal.ritualsapi.RitualsAPI
+import net.haremal.ritualsapi.cults.Cult
 import net.haremal.ritualsapi.debug.SyncDebugBoxesPacket.DebugBoxesCache
 import net.minecraft.core.BlockPos
 import net.minecraft.network.FriendlyByteBuf
@@ -12,8 +13,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext
 import kotlin.collections.iterator
 import kotlin.collections.plus
 
-data class SyncDebugBoxesPacket(val boxesByPos: Map<BlockPos, List<AABB>>) : CustomPacketPayload {
-
+data class SyncDebugBoxesPacket(val boxesByPos: Map<BlockPos, Map<ResourceLocation, List<AABB>>>) : CustomPacketPayload {
     companion object {
         val TYPE = CustomPacketPayload.Type<SyncDebugBoxesPacket>(
             ResourceLocation.fromNamespaceAndPath(RitualsAPI.MODID, "debug_boxes")
@@ -28,6 +28,11 @@ data class SyncDebugBoxesPacket(val boxesByPos: Map<BlockPos, List<AABB>>) : Cus
             { buf ->
                 BlockPos(buf.readInt(), buf.readInt(), buf.readInt())
             }
+        )
+
+        private val CULT_ID_CODEC = StreamCodec.of<FriendlyByteBuf, ResourceLocation>(
+            { buf, id -> buf.writeResourceLocation(id) },
+            { buf -> buf.readResourceLocation() }
         )
 
         private val BOX_CODEC = StreamCodec.of<FriendlyByteBuf, AABB>(
@@ -49,49 +54,49 @@ data class SyncDebugBoxesPacket(val boxesByPos: Map<BlockPos, List<AABB>>) : Cus
 
         val STREAM_CODEC: StreamCodec<FriendlyByteBuf, SyncDebugBoxesPacket> = StreamCodec.of(
             { buf, packet ->
-                // Write how many positions
                 buf.writeInt(packet.boxesByPos.size)
-                for ((pos, boxes) in packet.boxesByPos) {
+                for ((pos, cultMap) in packet.boxesByPos) {
                     BLOCKPOS_CODEC.encode(buf, pos)
-                    // Write how many boxes for this pos
-                    buf.writeInt(boxes.size)
-                    boxes.forEach { BOX_CODEC.encode(buf, it) }
+                    buf.writeInt(cultMap.size)
+                    for ((cultId, boxes) in cultMap) {
+                        CULT_ID_CODEC.encode(buf, cultId)
+                        buf.writeInt(boxes.size)
+                        boxes.forEach { BOX_CODEC.encode(buf, it) }
+                    }
                 }
             },
             { buf ->
-                val size = buf.readInt()
-                val map = mutableMapOf<BlockPos, List<AABB>>()
-                repeat(size) {
+                val outerSize = buf.readInt()
+                val result = mutableMapOf<BlockPos, Map<ResourceLocation, List<AABB>>>()
+                repeat(outerSize) {
                     val pos = BLOCKPOS_CODEC.decode(buf)
-                    val boxCount = buf.readInt()
-                    val boxes = mutableListOf<AABB>()
-                    repeat(boxCount) {
-                        boxes.add(BOX_CODEC.decode(buf))
+                    val cultMapSize = buf.readInt()
+                    val cultMap = mutableMapOf<ResourceLocation, List<AABB>>()
+                    repeat(cultMapSize) {
+                        val cultId = CULT_ID_CODEC.decode(buf)
+                        val boxCount = buf.readInt()
+                        val boxes = MutableList(boxCount) { BOX_CODEC.decode(buf) }
+                        cultMap[cultId] = boxes
                     }
-                    map[pos] = boxes
+                    result[pos] = cultMap
                 }
-                SyncDebugBoxesPacket(map)
+                SyncDebugBoxesPacket(result)
             }
         )
+
     }
 
     override fun type(): CustomPacketPayload.Type<out CustomPacketPayload> = TYPE
 
     object DebugBoxesCache {
-        var boxesByPos: Map<BlockPos, List<AABB>> = mapOf()
+        var boxesByPos: Map<BlockPos, Map<ResourceLocation, List<AABB>>> = mapOf()
     }
 }
 
 object DebugBoxesHandlers {
     fun clientHandleDebugBoxes(data: SyncDebugBoxesPacket, context: IPayloadContext) {
         context.enqueueWork {
-            val current = DebugBoxesCache.boxesByPos.toMutableMap()
-
-            for ((pos, boxes) in data.boxesByPos) {
-                current[pos] = (current[pos] ?: emptyList()) + boxes
-            }
-
-            DebugBoxesCache.boxesByPos = current
+            DebugBoxesCache.boxesByPos += data.boxesByPos
         }
     }
 }

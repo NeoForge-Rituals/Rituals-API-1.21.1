@@ -37,10 +37,10 @@ object CultEventsCM {
     }
 
     class BloodStainModel : GeoModel<BloodStainEntity>() {
-        override fun getModelResource(entity: BloodStainEntity?): ResourceLocation = ResourceLocation.fromNamespaceAndPath(
-            RitualsAPI.Companion.MODID, "geo/blood_stain.geo.json")
-        override fun getTextureResource(entity: BloodStainEntity?): ResourceLocation = ResourceLocation.fromNamespaceAndPath(
-            RitualsAPI.Companion.MODID, "textures/entity/blood_stains/blood_stain_1.png")
+        @Deprecated("Deprecated in Java")
+        override fun getModelResource(entity: BloodStainEntity?): ResourceLocation = ResourceLocation.fromNamespaceAndPath(RitualsAPI.Companion.MODID, "geo/blood_stain.geo.json")
+        @Deprecated("Deprecated in Java")
+        override fun getTextureResource(entity: BloodStainEntity?): ResourceLocation = ResourceLocation.fromNamespaceAndPath(RitualsAPI.Companion.MODID, "textures/entity/blood_stains/blood_stain_1.png")
         override fun getAnimationResource(entity: BloodStainEntity?): ResourceLocation? = null
     }
 }

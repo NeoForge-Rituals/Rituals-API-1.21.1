@@ -40,9 +40,7 @@ class AltarBlock(properties: Properties) : Block(properties), EntityBlock {
                 val tConditions = TargetingConditions.forNonCombat().range(radius)
                 val nearestEntity = level!!.getNearestEntity(LivingEntity::class.java, tConditions, null, worldPosition.center.x, worldPosition.center.y, worldPosition.center.z, detectArea)
 
-                // TODO: MAKE ANOTHER EXAMPLE CULT AND CHECK EVERYTHING * MAKE FOLLOWER ALWAYS HAVE CULT (AT LEAST RANDOM) ELSE TURN INTO VILLAGER
                 // TODO: IF ENTITY IS SETUP, CHECK THE REQUIREMENTS OF ALL RITUALS TILL MATCHES
-                // RITUAL CLASS (level, cult, type, sacrifice, requirements, cost)
                 // TODO: IF REQUIREMENTS ARE MET THEN ASSIGN FOLLOWERS OF THE SAME CULT AS SIGIL
                 // TODO: ASSIGNED FOLLOWERS GO TO THE ALTAR, EVERY OTHER ENTITY RUNS AWAY FROM THE ALTAR
                 (nearestEntity as? Mob)?.navigation?.stop() // TODO: REPLACE THIS WITH PARALYSING INJECTION

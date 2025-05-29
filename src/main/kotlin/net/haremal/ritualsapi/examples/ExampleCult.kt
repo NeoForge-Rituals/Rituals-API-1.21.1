@@ -1,4 +1,4 @@
-package net.haremal.ritualsapi.debug
+package net.haremal.ritualsapi.examples
 
 import net.haremal.ritualsapi.cults.Cult
 import net.minecraft.network.chat.Component
@@ -18,14 +18,12 @@ object ExampleCult : Cult(
         return player.inventory.contains(Items.STONE.defaultInstance)
     }
 
-    override fun magicSourceEnergy(player: ServerPlayer) {
-        callWithEnergy(player) {
-            val inv = player.inventory
-            val obsidianStack: ItemStack? = inv.items.find { it.item == Items.OBSIDIAN }
-            if (obsidianStack == null) return@callWithEnergy false
-            obsidianStack.shrink(1)
-            true
-        }
+    override fun magicSourceEnergy(player: ServerPlayer): Boolean {
+        val inv = player.inventory
+        val obsidianStack: ItemStack? = inv.items.find { it.item == Items.OBSIDIAN }
+        if (obsidianStack == null) return false
+        obsidianStack.shrink(1)
+        return true
     }
 
     override fun cultSigilGet(): Array<IntArray> = arrayOf(

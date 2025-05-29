@@ -40,7 +40,7 @@ object CultMemberManager {
     }
 
     // CLIENT SIDE ONLY
-    fun getCult(): Cult? {
+    fun getClientCult(): Cult? {
         val cultId = SyncCultPacket.ClientCultCache.id
         if (cultId == null) return null
         return Cult.get(cultId)

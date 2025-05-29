@@ -22,7 +22,7 @@ object CultEventsCG {
         // Checking if the player is in a cult
         val cultId = SyncCultPacket.ClientCultCache.id ?: return
         Cult.get(cultId) ?: return
-        CultMemberManager.getCult() ?: return
+        CultMemberManager.getClientCult() ?: return
 
         // Variables for rendering the bar
         val barLoad = maxOf(SyncEnergyPacket.ClientEnergyCache.energy, 5)

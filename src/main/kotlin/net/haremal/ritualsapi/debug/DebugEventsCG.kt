@@ -1,6 +1,7 @@
 package net.haremal.ritualsapi.debug
 
 import net.haremal.ritualsapi.RitualsAPI
+import net.haremal.ritualsapi.cults.CultMemberManager
 import net.minecraft.client.Minecraft
 import net.minecraft.client.renderer.LevelRenderer
 import net.minecraft.client.renderer.RenderType
@@ -40,7 +41,10 @@ object DebugEventsCG {
             pose.pushPose()
             pose.translate(-cameraPos.x, -cameraPos.y, -cameraPos.z)
 
-            for ((altarPos, boxes) in SyncDebugBoxesPacket.DebugBoxesCache.boxesByPos) {
+            val playerCultId = CultMemberManager.getClientCult()?.id ?: return
+
+            for ((altarPos, cultBoxesMap) in SyncDebugBoxesPacket.DebugBoxesCache.boxesByPos) {
+                val boxes = cultBoxesMap[playerCultId] ?: continue
                 for (box in boxes) {
                     LevelRenderer.renderLineBox(
                         pose, buffer, box,
@@ -48,6 +52,7 @@ object DebugEventsCG {
                     )
                 }
             }
+
 
             pose.popPose()
             bufferSource.endBatch()

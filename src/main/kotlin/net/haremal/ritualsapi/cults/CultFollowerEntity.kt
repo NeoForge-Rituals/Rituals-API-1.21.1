@@ -1,6 +1,5 @@
 package net.haremal.ritualsapi.cults
 
-import net.minecraft.nbt.CompoundTag
 import net.minecraft.util.TimeUtil
 import net.minecraft.util.valueproviders.UniformInt
 import net.minecraft.world.damagesource.DamageSource
@@ -31,7 +30,7 @@ class CultFollowerEntity(type: EntityType<CultFollowerEntity>, level: Level) : P
         goalSelector.addGoal(4, LookAtPlayerGoal(this, Player::class.java, 8.0f))
         goalSelector.addGoal(5, RandomLookAroundGoal(this))
 
-        targetSelector.addGoal(1, HurtByTargetGoal(this)) // Retaliate when hurt
+        targetSelector.addGoal(1, CultAwareHurtByTargetGoal(this))
         targetSelector.addGoal(2, ResetUniversalAngerTargetGoal(this, false)) // Stop anger after timer
     }
 
@@ -49,28 +48,32 @@ class CultFollowerEntity(type: EntityType<CultFollowerEntity>, level: Level) : P
         remainingPersistentAngerTime = PERSISTENT_ANGER_TIME.sample(random)
     }
 
-    override fun readAdditionalSaveData(compound: CompoundTag) {
-        super.readAdditionalSaveData(compound)
-        // No cultId to load
-    }
+    override fun tick() {
+        super.tick()
 
-    override fun addAdditionalSaveData(compound: CompoundTag) {
-        super.addAdditionalSaveData(compound)
-        // No cultId to save
+        if (CultMemberManager.getCult(this)?.id == null) {
+            CultMemberManager.joinCult(this, Cult.all().random())
+        }
+
+        val currentTarget = this.target
+        if (currentTarget is LivingEntity) {
+            val myCultId = CultMemberManager.getCult(this)?.id
+            val targetCultId = CultMemberManager.getCult(currentTarget)?.id
+
+            if (myCultId != null && targetCultId != null && myCultId == targetCultId) {
+                this.target = null
+                this.persistentAngerTarget = null
+                this.remainingPersistentAngerTime = 0
+
+                this.targetSelector.removeAllGoals { true }
+                this.goalSelector.removeAllGoals { true }
+                this.registerGoals()
+            }
+        }
     }
 
     override fun hurt(source: DamageSource, amount: Float): Boolean {
         val attacker = source.entity
-
-        // Check cult membership from CultMemberManager
-        if (attacker is LivingEntity) {
-            val attackerCult = CultMemberManager.getCult(attacker)?.id
-            val myCult = CultMemberManager.getCult(this)?.id
-            if (attackerCult != null && myCult != null && attackerCult == myCult) {
-                // Friendly fire blocked
-                return false
-            }
-        }
 
         val result = super.hurt(source, amount)
         if (result && attacker is LivingEntity) {
@@ -106,4 +109,14 @@ class CultFollowerEntity(type: EntityType<CultFollowerEntity>, level: Level) : P
             follower.target = attacker
         }
     }
+
+    class CultAwareHurtByTargetGoal(mob: PathfinderMob) : HurtByTargetGoal(mob) {
+        override fun canUse(): Boolean {
+            val attacker = mob.lastHurtByMob ?: return false
+            val attackerCult = CultMemberManager.getCult(attacker)?.id
+            val myCult = CultMemberManager.getCult(mob)?.id
+            return (attackerCult == null || attackerCult != myCult) && super.canUse()
+        }
+    }
+
 }
