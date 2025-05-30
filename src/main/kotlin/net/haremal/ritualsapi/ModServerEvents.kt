@@ -11,7 +11,7 @@ import net.haremal.ritualsapi.examples.Example2Cult
 import net.haremal.ritualsapi.examples.ExampleCult
 import net.haremal.ritualsapi.examples.ExampleRitual
 import net.haremal.ritualsapi.rituals.Ritual
-import net.haremal.ritualsapi.rituals.RitualSigilMatcher
+import net.haremal.ritualsapi.rituals.Ritual.RitualSigilMatcher.makeSigil
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
 import net.minecraft.world.entity.Mob
@@ -30,7 +30,7 @@ object ModServerEvents {
     @SubscribeEvent
     fun onCommonSetup(event: FMLCommonSetupEvent) {
         event.enqueueWork {
-            Cult.CultRegistry.cults.forEach { RitualSigilMatcher.makeSigil(it.value, it.value.cultSigilGet()) }
+            Cult.CultRegistry.cults.forEach { makeSigil(it.value, it.value.cultSigilGet()) }
         }
 
         // EXAMPLE
