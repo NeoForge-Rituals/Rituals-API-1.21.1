@@ -1,7 +1,6 @@
-package net.haremal.ritualsapi.cults
+package net.haremal.ritualsapi
 
-import net.haremal.ritualsapi.ModRegistries
-import net.haremal.ritualsapi.RitualsAPI
+import net.haremal.ritualsapi.cults.CultFollowerEntity
 import net.haremal.ritualsapi.rituals.BloodStainEntity
 import net.minecraft.client.model.VillagerModel
 import net.minecraft.client.model.geom.ModelLayers
@@ -16,7 +15,7 @@ import software.bernie.geckolib.model.GeoModel
 import software.bernie.geckolib.renderer.GeoEntityRenderer
 
 @EventBusSubscriber(modid = RitualsAPI.Companion.MODID, bus = EventBusSubscriber.Bus.MOD, value = [Dist.CLIENT])
-object CultEventsCM {
+object ModClientEvents {
     @SubscribeEvent
     fun onRegisterRenderers(event: EntityRenderersEvent.RegisterRenderers) {
         event.registerEntityRenderer(ModRegistries.CULT_FOLLOWER_ENTITY.get()) { c -> CultFollowerRenderer(c) }
@@ -32,7 +31,7 @@ object CultEventsCM {
     class BloodStainsRenderer(context: EntityRendererProvider.Context) : GeoEntityRenderer<BloodStainEntity>(context, BloodStainModel()) {
         override fun getTextureLocation(entity: BloodStainEntity): ResourceLocation = textures[entity.id % textures.size]
         val textures = listOf(
-            ResourceLocation.fromNamespaceAndPath(RitualsAPI.Companion.MODID, "textures/entity/blood_stains/blood_stain_1.png")
+            ResourceLocation.fromNamespaceAndPath(RitualsAPI.Companion.MODID, "textures/entity/blood_stains/blood_stain_0.png")
         )
     }
 

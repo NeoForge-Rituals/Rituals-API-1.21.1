@@ -1,5 +1,6 @@
 package net.haremal.ritualsapi.rituals
 
+import net.haremal.ritualsapi.cults.Cult
 import net.haremal.ritualsapi.cults.CultMemberManager.getCult
 import net.minecraft.world.InteractionHand
 import net.minecraft.world.InteractionResultHolder
@@ -26,14 +27,20 @@ class RitualDaggerItem(properties: Properties) : SwordItem(Tiers.IRON, propertie
     }
 
     override fun hurtEnemy(stack: ItemStack, target: LivingEntity, attacker: LivingEntity): Boolean {
-        val altarBE = attacker.level().getBlockEntity(target.blockPosition().below()) as? AltarBlock.AltarBlockEntity
-        if (altarBE != null) {
-            if (altarBE.cultId == null || altarBE.cultId != getCult(attacker)?.id) return super.hurtEnemy(stack, target, attacker) // only proceed if cults match
-            altarBE.isPerfoming = true
+        val altarBE = attacker.level().getBlockEntity(target.blockPosition().below()) as? AltarBlock.AltarBlockEntity?: return super.hurtEnemy(stack, target, attacker)
+        if (isPerformable(altarBE, attacker, target)) {
+            altarBE.shouldPerform = true
             altarBE.setChanged()
+            target.hurt(attacker.level().damageSources().magic(), Float.MAX_VALUE)
         }
 
         return super.hurtEnemy(stack, target, attacker)
     }
 
+
+    fun isPerformable(altar: AltarBlock.AltarBlockEntity, attacker: LivingEntity, target: LivingEntity): Boolean {
+        Cult.Sigil.getMatchingSigil(attacker.level(), altar.blockPos)?: return false
+        altar.findMatchingRitual(attacker.level(), altar.blockPos, altar.sacrificedType, altar.cultId?: return false)?: return false
+        return altar.cultId == getCult(attacker)?.id
+    }
 }

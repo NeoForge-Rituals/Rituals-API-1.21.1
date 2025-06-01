@@ -23,6 +23,6 @@ object ExampleRitual : Ritual(
         return level.isNight
     }
 
-    override fun perform(level: Level, pos: BlockPos) {
+    override fun result(level: Level, pos: BlockPos) {
         level.setRainLevel(1f) }
 }
