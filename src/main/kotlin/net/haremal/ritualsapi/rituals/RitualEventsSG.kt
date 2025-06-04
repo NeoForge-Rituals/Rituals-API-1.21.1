@@ -15,7 +15,7 @@ import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent
 import net.neoforged.neoforge.event.tick.ServerTickEvent
 
 @EventBusSubscriber(modid = RitualsAPI.Companion.MODID, bus = EventBusSubscriber.Bus.GAME)
-object BloodEventsSG {
+object RitualEventsSG {
     @SubscribeEvent
     fun onServerTick(event: ServerTickEvent.Post) {
         BloodStainEntity.Companion.bloodDrop.entries.removeIf { (_, data) -> data.timer <= 0 }

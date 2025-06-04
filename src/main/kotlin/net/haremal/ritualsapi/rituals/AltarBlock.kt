@@ -4,13 +4,12 @@ import net.haremal.ritualsapi.ModRegistries
 import net.haremal.ritualsapi.cults.Cult
 import net.haremal.ritualsapi.cults.CultFollowerEntity
 import net.haremal.ritualsapi.cults.CultMemberManager
+import net.minecraft.commands.arguments.EntityAnchorArgument
 import net.minecraft.core.BlockPos
-import net.minecraft.core.HolderLookup
-import net.minecraft.core.particles.ParticleTypes
-import net.minecraft.nbt.CompoundTag
 import net.minecraft.resources.ResourceLocation
-import net.minecraft.world.entity.EntityType
 import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.Mob
+import net.minecraft.world.entity.player.Player
 import net.minecraft.world.level.BlockGetter
 import net.minecraft.world.level.Level
 import net.minecraft.world.level.block.Block
@@ -21,12 +20,13 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker
 import net.minecraft.world.level.block.entity.BlockEntityType
 import net.minecraft.world.level.block.state.BlockState
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
 import net.minecraft.world.phys.shapes.CollisionContext
 import net.minecraft.world.phys.shapes.VoxelShape
+import kotlin.math.sqrt
 
 class AltarBlock(properties: Properties) : Block(properties), EntityBlock {
-    enum class RitualType { SUMMONING, EMPOWERMENT, CURSE, TRANSFORMATION }
-    enum class AltarLevel(val followersNumber: Int) { SIMPLE(1), MINOR(3), STANDARD(6), MAJOR(9), GRAND(12), APOCALYPTIC(15) }
+    enum class AltarLevel(val requiredFollowersAmount: Int) { SIMPLE(1), MINOR(3), STANDARD(6), MAJOR(9), GRAND(12), APOCALYPTIC(15) }
     override fun getShape(state: BlockState, level: BlockGetter, pos: BlockPos, context: CollisionContext): VoxelShape {
         return super.getShape(state, level, pos, context)
     }
@@ -39,30 +39,12 @@ class AltarBlock(properties: Properties) : Block(properties), EntityBlock {
     }
 
     class AltarBlockEntity(pos: BlockPos, state: BlockState) : BlockEntity(ModRegistries.ALTAR_BLOCK_ENTITY.get(), pos, state) {
-        var shouldPerform = false
-        var perfomingTime = 100
-        var sacrificedType: EntityType<*>? = null
-        var cultId: ResourceLocation? = null  // Add this
+        var ritualStarted = false
+        var performingTime = 100
 
-        override fun saveAdditional(tag: CompoundTag, registries: HolderLookup.Provider) {
-            super.saveAdditional(tag, registries)
-            cultId?.let { tag.putString("CultId", it.toString()) }
-            sacrificedType?.let { tag.putString("SacrificedType", it.toString()) }
-            tag.putBoolean("IsPerforming", shouldPerform)
-            tag.putInt("PerformingTime", perfomingTime)
-        }
-
-        override fun loadAdditional(tag: CompoundTag, registries: HolderLookup.Provider) {
-            super.loadAdditional(tag, registries)
-            cultId = tag.getString("CultId").takeIf { it.isNotEmpty() }?.let { ResourceLocation.parse(it) }
-            sacrificedType = tag.getString("SacrificedType").takeIf { it.isNotEmpty() }?.let { id ->
-                // You need to get the EntityType by its ResourceLocation registry name:
-                EntityType.byString(id).orElse(null)
-            }
-            shouldPerform = tag.getBoolean("IsPerforming")
-            perfomingTime = tag.getInt("PerformingTime")
-
-        }
+        val followerTargets = mutableMapOf<CultFollowerEntity, Triple<Double, Double, Double>>()
+        var ritualActive: Boolean = false
+        var ritual: Ritual? = null
 
         // TODO: CHANGE LATER TO ALTAR LEVELS STRUCTURES
         fun getAltarLevel(level: Level): AltarLevel {
@@ -72,107 +54,201 @@ class AltarBlock(properties: Properties) : Block(properties), EntityBlock {
 
         fun tick() {
             val level = level ?: return
+            if (level.isClientSide) return
 
-            // WHAT CULT?
-            val sigil = Cult.Sigil.getMatchingSigil(level, worldPosition) ?: run { stopRitual(); return }
-            cultId?: run { cultId = sigil.key; setChanged() }
+            val cultId = Cult.Sigil.getMatchingSigil(level, worldPosition)?.key?: run { stopRitual(); return }
+            if(ritualActive) { getFollowersToAltar(level, worldPosition, getAltarLevel(level).requiredFollowersAmount, cultId) ?: run { stopRitual(); return } }
 
-            // TODO: CHANGE THAT LATER
-            level.addParticle(ParticleTypes.SOUL_FIRE_FLAME, worldPosition.x + 0.5 + level.random.nextGaussian() * 0.1, worldPosition.y + 1.7, worldPosition.z + 0.5 + level.random.nextGaussian() * 0.1, 0.0, 0.01, 0.0)
+            if(ritualStarted && ritual != null) {
+                if(ritual!!.altarLevel != getAltarLevel(level) || ritual!!.requirementsAreMet(level, worldPosition).not() || ritual!!.cult.id != cultId) { stopRitual(); return }
+                scareMobsAround(cultId, level)
 
-            println(getAltarLevel(level)) //TODO
+                performingTime.takeIf { it > 0 }?.run { performingTime--; return }
+                ritual!!.result(level, worldPosition); stopRitual(); return
+            }
 
-            // WHAT RITUAL?
-            getEntityStandingOnAltar(level, worldPosition)?.let { sacrificedType = it.type; setChanged() }
-            val ritual = findMatchingRitual(level, worldPosition, sacrificedType, cultId!!) ?: run { stopRitual(); return }
-
-            // FOLLOWERS HERE?
-            val assignedFollowers = getFollowersAround(level, worldPosition, getAltarLevel(level).followersNumber).ifEmpty { null } ?: run { stopRitual(); return }
-            positionFollowersInCircle(worldPosition, assignedFollowers)
-
-            // DAGGER HIT?
-            shouldPerform.takeIf { it } ?: run { stopRitual(); return }
-            // RITUAL PERFORMANCE
-            perfomingTime.takeIf { it > 0 }?.run { perfomingTime--; setChanged(); return }
-            // RITUAL END
-            ritual.result(level, worldPosition); stopRitual()
+            ritual = findMatchingRitual(level, worldPosition, cultId) ?: run { stopRitual(); return }
+            scareMobsAround(cultId, level); ritualActive=true
         }
-
 
         fun stopRitual(){
-            shouldPerform = false
-            perfomingTime = 100
-            setChanged()
+            followerTargets.keys.forEach { f ->
+                if (f.isAlive) {
+                    f.setNoAi(false)
+                    f.navigation.stop()
+                }
+            }
+            ritualActive=false
+            followerTargets.clear()
+            ritualStarted = false
+
+            performingTime = 100
+            ritual = null
         }
 
-        fun getEntityStandingOnAltar(level: Level, pos: BlockPos): LivingEntity? {
-            val centerX = pos.x + 0.5
-            val centerY = pos.y + 1.0  // One block above
-            val centerZ = pos.z + 0.5
-
+        fun findMatchingRitual(level: Level, pos: BlockPos, cultId: ResourceLocation): Ritual? {
+            val centerX = pos.x + 0.5; val centerY = pos.y + 1.0; val centerZ = pos.z + 0.5
             val aabb = AABB(centerX - 0.3, centerY - 0.1, centerZ - 0.3, centerX + 0.3, centerY + 0.8, centerZ + 0.3)
-            return level.getEntitiesOfClass(LivingEntity::class.java, aabb)
-                .firstOrNull { it.isAlive }
-        }
+            val sacrifice = level.getEntitiesOfClass(LivingEntity::class.java, aabb).firstOrNull { it.isAlive }
 
-        fun findMatchingRitual(
-            level: Level,
-            pos: BlockPos,
-            target: EntityType<*>?,
-            cultId: ResourceLocation
-        ): Ritual? {
             val blockAltarLevel = getAltarLevel(level)
             return Ritual.all().firstOrNull { ritual ->
                 ritual.altarLevel.ordinal <= blockAltarLevel.ordinal &&
                         ritual.requirementsAreMet(level, pos) &&
                         ritual.cult.id == cultId &&
-                        ritual.sacrifice == target
+                        ritual.sacrifice == sacrifice?.type
             }
         }
 
-        fun getFollowersAround(level: Level, pos: BlockPos, followersNumber: Int): List<CultFollowerEntity> {
-            val centerX = pos.x + 0.5
-            val centerY = pos.y.toDouble()
-            val centerZ = pos.z + 0.5
+        fun scareMobsAround(cultId: ResourceLocation, level: Level) {
+            val x = worldPosition.x + 0.5
+            val y = worldPosition.y.toDouble()
+            val z = worldPosition.z + 0.5
+            val radius = 50.0
 
-            val radius = 50
+            val area = AABB(x - radius, y - radius, z - radius, x + radius, y + radius, z + radius)
 
-            val aabb = AABB(centerX - radius, centerY - radius, centerZ - radius, centerX + radius, centerY + radius, centerZ + radius)
-            return level.getEntitiesOfClass(CultFollowerEntity::class.java, aabb)
-                .filter  { it.isAlive; CultMemberManager.getCult(it)?.id == cultId }
-                .sortedBy { it.distanceToSqr(pos.x + 0.5, pos.y + 0.5, pos.z + 0.5) }
-                .take(followersNumber-1)
+            val allLiving = level.getEntitiesOfClass(LivingEntity::class.java, area)
+                .filter { it !is Player && CultMemberManager.getCult(it)?.id != cultId}
+
+            allLiving.forEach { entity ->
+                if (entity !is Mob) return@forEach // Skip non-navigating entities
+
+                val entityPos = entity.position()
+                val dx = entityPos.x - x
+                val dy = entityPos.y - y
+                val dz = entityPos.z - z
+                val len = sqrt(dx * dx + dy * dy + dz * dz)
+                if (len == 0.0) return@forEach
+
+                val fleeX = entityPos.x + (dx / len) * 10
+                val fleeY = entityPos.y
+                val fleeZ = entityPos.z + (dz / len) * 10
+
+                entity.navigation.moveTo(fleeX, fleeY, fleeZ, 2.0)
+            }
+
         }
 
-        // TODO CACHE THE ENTITIES (OR STH) SO THEY NOT TELEPORT :C
-        fun positionFollowersInCircle(center: BlockPos, followers: List<LivingEntity>) {
-            val closeRadius = 1.0  // distance from center
-            val angleCloseStep = (2 * Math.PI) / 3
-            val closeFollowers = followers.take(2)
-            closeFollowers.forEachIndexed { index, follower ->
-                val angle = angleCloseStep * index
-                val x = center.x + 0.5 + closeRadius * kotlin.math.cos(angle)
-                val z = center.z + 0.5 + closeRadius * kotlin.math.sin(angle)
-                val y = center.y.toDouble() // adjust for surface level if needed
-                follower.teleportTo(x, y, z)
+        fun getFollowersToAltar(level: Level, pos: BlockPos, requiredAmount: Int, cultId: ResourceLocation): List<CultFollowerEntity>? {
+            // How many followers we need around the altar block itself:
+            val trueRequired = requiredAmount - 1
+
+            // Altar’s center coordinates:
+            val cx = pos.x + 0.5
+            val cy = pos.y.toDouble()
+            val cz = pos.z + 0.5
+
+            // 1) If we haven’t assigned anyone yet, pick & send them walking:
+            if (followerTargets.isEmpty() ) {
+                // a) Gather all alive cult followers within 50 blocks
+                val searchAABB = AABB(
+                    cx - 50.0, cy - 50.0, cz - 50.0,
+                    cx + 50.0, cy + 50.0, cz + 50.0
+                )
+                val allFollowers = level.getEntitiesOfClass(CultFollowerEntity::class.java, searchAABB)
+                    .filter { it.isAlive && CultMemberManager.getCult(it)?.id == cultId }
+                    .sortedBy { it.distanceToSqr(cx, cy, cz) }
+
+                // b) If not enough, bail out
+                if (allFollowers.size < trueRequired) return null
+
+                // c) Take the nearest trueRequired followers
+                val chosen = allFollowers.take(trueRequired)
+
+                // d) Compute two “close” spots at radius=1.0 (angles 0° and 120°)
+                val closeRadius = 1.0
+                val angleCloseStep = (2 * Math.PI) / 3.0
+                val closeSpots = List(2) { i ->
+                    val a = angleCloseStep * i
+                    Triple(
+                        cx + closeRadius * kotlin.math.cos(a),
+                        cy,
+                        cz + closeRadius * kotlin.math.sin(a)
+                    )
+                }
+
+                // e) Compute the remaining “far” spots at radius=5.0
+                val farCount = trueRequired - 2
+                val farRadius = 5.0
+                val angleFarStep = (2 * Math.PI) / farCount
+                val farSpots = List(farCount) { i ->
+                    val a = angleFarStep * i
+                    Triple(
+                        cx + farRadius * kotlin.math.cos(a),
+                        cy,
+                        cz + farRadius * kotlin.math.sin(a)
+                    )
+                }
+
+                // f) Combine all spots (close first, then far)
+                val allSpots = closeSpots + farSpots
+
+                // g) Assign each spot to the closest unassigned follower, start pathfinding
+                val assignedSet = mutableSetOf<CultFollowerEntity>()
+                allSpots.forEach { (tx, ty, tz) ->
+                    val nextFollower = chosen
+                        .filter { it !in assignedSet }
+                        .minByOrNull { it.distanceToSqr(tx, ty, tz) }
+                        ?: return null
+
+                    assignedSet += nextFollower
+                    followerTargets[nextFollower] = Triple(tx, ty, tz)
+                    nextFollower.navigation.moveTo(tx, ty, tz, 1.5)
+                }
+
+                // h) Return the chosen list now that assignment succeeded
+                return chosen.toList()
             }
 
-            if(followers.count()<3) return
+            // 2) If followerTargets is not empty, we already assigned last tick; update their movement:
+            val iterator = followerTargets.entries.iterator()
+            while (iterator.hasNext()) {
+                val (follower, target) = iterator.next()
 
-            val farRadius = 5.0  // distance from center
-            val angleFarStep = (2 * Math.PI) / (followers.size - 2)
-            val farFollowers = followers - closeFollowers
-            farFollowers.forEachIndexed { index, follower ->
-                val angle = angleFarStep * index
-                val x = center.x + 0.5 + farRadius * kotlin.math.cos(angle)
-                val z = center.z + 0.5 + farRadius * kotlin.math.sin(angle)
-                val y = center.y.toDouble() // adjust for surface level if needed
-                follower.teleportTo(x, y, z)
+                // a) If follower died, remove from map
+                if (!follower.isAlive) {
+                    stopRitual(); return null
+                }
+
+                val (tx, ty, tz) = target
+                val distSq = follower.distanceToSqr(tx, ty, tz)
+
+                if (distSq <= 3) {
+                    // b) They’ve arrived: teleport exactly onto the spot and freeze (disable AI)
+                    follower.teleportTo(tx, ty, tz)
+                    follower.lookAt(EntityAnchorArgument.Anchor.EYES, Vec3(pos.x + 0.5, pos.y + 1.0, pos.z + 0.5))
+                    follower.setNoAi(true)
+                    follower.navigation.stop()
+                } else {
+                    // c) Still walking: if path ended prematurely, reissue moveTo
+                    if (follower.navigation.isDone) {
+                        follower.navigation.moveTo(tx, ty, tz, 1.5)
+                    }
+                }
             }
 
+            // 3) Return the list of already‐assigned followers (they remain in the map until ritual ends)
+            return followerTargets.keys.toList()
+        }
+
+        fun areFollowersInPosition(tolerance: Double = 0.5): Boolean {
+            followerTargets.forEach { (follower, targetPos) ->
+                if (!follower.isAlive) return false
+                val (tx, ty, tz) = targetPos
+                val distSq = follower.distanceToSqr(tx, ty, tz)
+                if (distSq > tolerance * tolerance) return false
+            }
+            return true
+        }
+
+
+        override fun setRemoved() {
+            stopRitual()
+            super.setRemoved()
         }
     }
 }
 
-// TODO: ASSIGNED FOLLOWERS GO TO THE ALTAR, EVERY OTHER ENTITY RUNS AWAY FROM THE ALTAR
-// TODO: ADD PARALYSING INJECTION
+// TODO: ADD [UNMOVING ENTITIES ITEM] FOR SETTING ENTITIES UP ON THE ALTAR
+// TODO: FIX FOLLOWERS DESPAWNING WHEN UNLOADED

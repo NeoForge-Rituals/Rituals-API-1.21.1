@@ -13,9 +13,8 @@ import net.minecraft.world.level.Level
 object ExampleRitual : Ritual(
     ResourceLocation.fromNamespaceAndPath(RitualsAPI.MODID, "example_ritual"),
     Component.literal("Example Ritual"),
-    "Sets an nearby forest on fire",
+    "Set raining",
     AltarBlock.AltarLevel.STANDARD,
-    AltarBlock.RitualType.CURSE,
     ExampleCult,
     EntityType.BLAZE
 ) {
