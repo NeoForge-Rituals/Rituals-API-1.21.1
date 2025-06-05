@@ -16,6 +16,9 @@ import net.minecraft.world.phys.AABB
 import java.util.UUID
 
 class CultFollowerEntity(type: EntityType<CultFollowerEntity>, level: Level) : PathfinderMob(type, level), NeutralMob {
+    init { this.setPersistenceRequired() }
+    override fun removeWhenFarAway(distanceToClosestPlayer: Double): Boolean = false
+    override fun shouldDespawnInPeaceful(): Boolean = false
     companion object {
         private val PERSISTENT_ANGER_TIME: UniformInt = TimeUtil.rangeOfSeconds(30, 60)
     }
@@ -118,5 +121,4 @@ class CultFollowerEntity(type: EntityType<CultFollowerEntity>, level: Level) : P
             return (attackerCult == null || attackerCult != myCult) && super.canUse()
         }
     }
-
 }

@@ -9,7 +9,6 @@ import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.EntityType
 import net.minecraft.world.level.Level
 
-
 object ExampleRitual : Ritual(
     ResourceLocation.fromNamespaceAndPath(RitualsAPI.MODID, "example_ritual"),
     Component.literal("Example Ritual"),
@@ -23,5 +22,6 @@ object ExampleRitual : Ritual(
     }
 
     override fun result(level: Level, pos: BlockPos) {
-        level.setRainLevel(1f) }
+        level.setRainLevel(1f)
+    }
 }

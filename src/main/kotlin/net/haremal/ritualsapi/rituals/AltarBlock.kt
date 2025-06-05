@@ -131,33 +131,17 @@ class AltarBlock(properties: Properties) : Block(properties), EntityBlock {
         }
 
         fun getFollowersToAltar(level: Level, pos: BlockPos, requiredAmount: Int, cultId: ResourceLocation): List<CultFollowerEntity>? {
-            // How many followers we need around the altar block itself:
             val trueRequired = requiredAmount - 1
-
-            // Altar’s center coordinates:
-            val cx = pos.x + 0.5
-            val cy = pos.y.toDouble()
-            val cz = pos.z + 0.5
-
-            // 1) If we haven’t assigned anyone yet, pick & send them walking:
+            val cx = pos.x + 0.5; val cy = pos.y.toDouble(); val cz = pos.z + 0.5
             if (followerTargets.isEmpty() ) {
-                // a) Gather all alive cult followers within 50 blocks
-                val searchAABB = AABB(
-                    cx - 50.0, cy - 50.0, cz - 50.0,
-                    cx + 50.0, cy + 50.0, cz + 50.0
-                )
+                val searchAABB = AABB(cx - 50.0, cy - 50.0, cz - 50.0, cx + 50.0, cy + 50.0, cz + 50.0)
                 val allFollowers = level.getEntitiesOfClass(CultFollowerEntity::class.java, searchAABB)
                     .filter { it.isAlive && CultMemberManager.getCult(it)?.id == cultId }
                     .sortedBy { it.distanceToSqr(cx, cy, cz) }
-
-                // b) If not enough, bail out
                 if (allFollowers.size < trueRequired) return null
-
-                // c) Take the nearest trueRequired followers
                 val chosen = allFollowers.take(trueRequired)
 
-                // d) Compute two “close” spots at radius=1.0 (angles 0° and 120°)
-                val closeRadius = 1.0
+                val closeRadius = 1.5
                 val angleCloseStep = (2 * Math.PI) / 3.0
                 val closeSpots = List(2) { i ->
                     val a = angleCloseStep * i
@@ -168,7 +152,6 @@ class AltarBlock(properties: Properties) : Block(properties), EntityBlock {
                     )
                 }
 
-                // e) Compute the remaining “far” spots at radius=5.0
                 val farCount = trueRequired - 2
                 val farRadius = 5.0
                 val angleFarStep = (2 * Math.PI) / farCount
@@ -181,36 +164,24 @@ class AltarBlock(properties: Properties) : Block(properties), EntityBlock {
                     )
                 }
 
-                // f) Combine all spots (close first, then far)
                 val allSpots = closeSpots + farSpots
-
-                // g) Assign each spot to the closest unassigned follower, start pathfinding
                 val assignedSet = mutableSetOf<CultFollowerEntity>()
                 allSpots.forEach { (tx, ty, tz) ->
                     val nextFollower = chosen
                         .filter { it !in assignedSet }
                         .minByOrNull { it.distanceToSqr(tx, ty, tz) }
                         ?: return null
-
                     assignedSet += nextFollower
                     followerTargets[nextFollower] = Triple(tx, ty, tz)
                     nextFollower.navigation.moveTo(tx, ty, tz, 1.5)
                 }
-
-                // h) Return the chosen list now that assignment succeeded
                 return chosen.toList()
             }
 
-            // 2) If followerTargets is not empty, we already assigned last tick; update their movement:
             val iterator = followerTargets.entries.iterator()
             while (iterator.hasNext()) {
                 val (follower, target) = iterator.next()
-
-                // a) If follower died, remove from map
-                if (!follower.isAlive) {
-                    stopRitual(); return null
-                }
-
+                if (!follower.isAlive) { stopRitual(); return null }
                 val (tx, ty, tz) = target
                 val distSq = follower.distanceToSqr(tx, ty, tz)
 
@@ -221,14 +192,11 @@ class AltarBlock(properties: Properties) : Block(properties), EntityBlock {
                     follower.setNoAi(true)
                     follower.navigation.stop()
                 } else {
-                    // c) Still walking: if path ended prematurely, reissue moveTo
                     if (follower.navigation.isDone) {
                         follower.navigation.moveTo(tx, ty, tz, 1.5)
                     }
                 }
             }
-
-            // 3) Return the list of already‐assigned followers (they remain in the map until ritual ends)
             return followerTargets.keys.toList()
         }
 
@@ -242,7 +210,6 @@ class AltarBlock(properties: Properties) : Block(properties), EntityBlock {
             return true
         }
 
-
         override fun setRemoved() {
             stopRitual()
             super.setRemoved()
@@ -251,4 +218,3 @@ class AltarBlock(properties: Properties) : Block(properties), EntityBlock {
 }
 
 // TODO: ADD [UNMOVING ENTITIES ITEM] FOR SETTING ENTITIES UP ON THE ALTAR
-// TODO: FIX FOLLOWERS DESPAWNING WHEN UNLOADED
