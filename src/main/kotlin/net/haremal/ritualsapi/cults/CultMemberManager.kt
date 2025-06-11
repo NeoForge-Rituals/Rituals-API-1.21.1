@@ -13,12 +13,10 @@ object CultMemberManager {
         entity.persistentData.putString(CULT_ID_KEY, cult.id.toString())
         if(entity is ServerPlayer) SyncCultPacket.syncToPlayer(entity, cult)
     }
-
     fun leaveCult(entity: ServerPlayer) {
         entity.persistentData.remove(CULT_ID_KEY)
         SyncCultPacket.syncToPlayer(entity, null)
     }
-
     fun tickCult(level: ServerLevel) {
         Cult.all().forEach { cult ->
             cult.onTick(level)
@@ -30,16 +28,12 @@ object CultMemberManager {
             }
         }
     }
-
-    // SERVER SIDE ONLY
     fun getCult(entity: LivingEntity): Cult? {
         val idString = entity.persistentData.getString(CULT_ID_KEY)
         if (idString.isNullOrBlank()) return null
         val id = ResourceLocation.tryParse(idString) ?: return null
         return Cult.get(id)
     }
-
-    // CLIENT SIDE ONLY
     fun getClientCult(): Cult? {
         val cultId = SyncCultPacket.ClientCultCache.id
         if (cultId == null) return null

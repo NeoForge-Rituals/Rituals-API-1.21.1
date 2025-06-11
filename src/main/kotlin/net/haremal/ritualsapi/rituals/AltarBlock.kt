@@ -46,11 +46,6 @@ class AltarBlock(properties: Properties) : Block(properties), EntityBlock {
         var ritualActive: Boolean = false
         var ritual: Ritual? = null
 
-        // TODO: CHANGE LATER TO ALTAR LEVELS STRUCTURES
-        fun getAltarLevel(level: Level): AltarLevel {
-            val blockBelow = level.getBlockState(worldPosition.below()).block
-            return if (blockBelow == Blocks.REDSTONE_BLOCK) AltarLevel.STANDARD else AltarLevel.MINOR
-        }
 
         fun tick() {
             val level = level ?: return
@@ -61,8 +56,10 @@ class AltarBlock(properties: Properties) : Block(properties), EntityBlock {
 
             if(ritualStarted && ritual != null) {
                 if(ritual!!.altarLevel != getAltarLevel(level) || ritual!!.requirementsAreMet(level, worldPosition).not() || ritual!!.cult.id != cultId) { stopRitual(); return }
-                scareMobsAround(cultId, level)
 
+                // TODO: SOUNDS AND ANIMATIONS HERE
+
+                scareMobsAround(cultId, level)
                 performingTime.takeIf { it > 0 }?.run { performingTime--; return }
                 ritual!!.result(level, worldPosition); stopRitual(); return
             }
@@ -85,7 +82,11 @@ class AltarBlock(properties: Properties) : Block(properties), EntityBlock {
             performingTime = 100
             ritual = null
         }
-
+        // TODO: CHANGE LATER TO ALTAR LEVELS STRUCTURES
+        fun getAltarLevel(level: Level): AltarLevel {
+            val blockBelow = level.getBlockState(worldPosition.below()).block
+            return if (blockBelow == Blocks.REDSTONE_BLOCK) AltarLevel.STANDARD else AltarLevel.MINOR
+        }
         fun findMatchingRitual(level: Level, pos: BlockPos, cultId: ResourceLocation): Ritual? {
             val centerX = pos.x + 0.5; val centerY = pos.y + 1.0; val centerZ = pos.z + 0.5
             val aabb = AABB(centerX - 0.3, centerY - 0.1, centerZ - 0.3, centerX + 0.3, centerY + 0.8, centerZ + 0.3)
@@ -99,7 +100,6 @@ class AltarBlock(properties: Properties) : Block(properties), EntityBlock {
                         ritual.sacrifice == sacrifice?.type
             }
         }
-
         fun scareMobsAround(cultId: ResourceLocation, level: Level) {
             val x = worldPosition.x + 0.5
             val y = worldPosition.y.toDouble()
@@ -129,7 +129,6 @@ class AltarBlock(properties: Properties) : Block(properties), EntityBlock {
             }
 
         }
-
         fun getFollowersToAltar(level: Level, pos: BlockPos, requiredAmount: Int, cultId: ResourceLocation): List<CultFollowerEntity>? {
             val trueRequired = requiredAmount - 1
             val cx = pos.x + 0.5; val cy = pos.y.toDouble(); val cz = pos.z + 0.5
@@ -199,7 +198,6 @@ class AltarBlock(properties: Properties) : Block(properties), EntityBlock {
             }
             return followerTargets.keys.toList()
         }
-
         fun areFollowersInPosition(tolerance: Double = 0.5): Boolean {
             followerTargets.forEach { (follower, targetPos) ->
                 if (!follower.isAlive) return false
@@ -217,4 +215,6 @@ class AltarBlock(properties: Properties) : Block(properties), EntityBlock {
     }
 }
 
-// TODO: ADD [UNMOVING ENTITIES ITEM] FOR SETTING ENTITIES UP ON THE ALTAR
+
+// TODO: ADD CARRYING KNOCKED OUT ENEMIES AND CAGE FOR TRAPPING THEM ON ALTAR
+// TODO: SACRIFICE/CULT CAN BE NULL FOR CREATING RITUAL

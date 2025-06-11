@@ -51,7 +51,6 @@ abstract class Cult (
                 sigilBoxes.all { box -> bloodStains.any { it.boundingBox.intersects(box) } }
             }
         }
-
         fun makeSigil(cult: Cult, sigil: Array<IntArray>) {
             val gridSize = sigil.size
             val cellSize = 0.5
@@ -71,8 +70,6 @@ abstract class Cult (
             SIGILS[cult.id] = boxes
         }
     }
-
-
 
     private var lastSyncedEnergy = -1
     var magicEnergy: Int = 0

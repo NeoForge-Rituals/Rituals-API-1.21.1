@@ -13,7 +13,6 @@ import kotlin.collections.iterator
 
 @EventBusSubscriber(modid = RitualsAPI.Companion.MODID, bus = EventBusSubscriber.Bus.GAME, value = [Dist.CLIENT])
 object DebugEventsCG {
-
     @SubscribeEvent
     fun onRenderLevelStage(event: RenderLevelStageEvent) {
         val level = Minecraft.getInstance().level ?: return

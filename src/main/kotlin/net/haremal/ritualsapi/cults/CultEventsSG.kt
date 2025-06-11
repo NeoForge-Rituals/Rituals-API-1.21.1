@@ -19,6 +19,7 @@ object CultEventsSG {
         val level = event.level
         if (level is ServerLevel) CultMemberManager.tickCult(level)
     }
+
     @SubscribeEvent
     fun saveCultForLogin(event: PlayerEvent.PlayerLoggedInEvent) {
         val player = event.entity
@@ -60,5 +61,4 @@ object CultEventsSG {
             }
         }
     }
-
 }

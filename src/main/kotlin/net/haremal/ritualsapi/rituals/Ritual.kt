@@ -5,7 +5,9 @@ import net.minecraft.core.BlockPos
 import net.minecraft.network.chat.MutableComponent
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.decoration.LeashFenceKnotEntity
 import net.minecraft.world.level.Level
+import java.util.UUID
 
 abstract class Ritual(
     val id: ResourceLocation,
@@ -27,6 +29,7 @@ abstract class Ritual(
         fun all(): Collection<Ritual> = rituals.values
         fun init() {}
     }
+
     abstract fun requirementsAreMet(level: Level, pos: BlockPos): Boolean
     abstract fun result(level: Level, pos: BlockPos)
 }

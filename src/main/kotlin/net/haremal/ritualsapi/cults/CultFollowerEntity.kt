@@ -46,9 +46,44 @@ class CultFollowerEntity(type: EntityType<CultFollowerEntity>, level: Level) : P
     override fun setPersistentAngerTarget(target: UUID?) {
         persistentAngerTarget = target
     }
-
     override fun startPersistentAngerTimer() {
         remainingPersistentAngerTime = PERSISTENT_ANGER_TIME.sample(random)
+    }
+    override fun hurt(source: DamageSource, amount: Float): Boolean {
+        val attacker = source.entity
+
+        val result = super.hurt(source, amount)
+        if (result && attacker is LivingEntity) {
+            callNearbyFollowers(attacker)
+            persistentAngerTarget = attacker.uuid
+            startPersistentAngerTimer()
+            target = attacker
+        }
+        return result
+    }
+    private fun callNearbyFollowers(attacker: LivingEntity) {
+        if (level() == null) return
+
+        val radius = 20.0
+        val aabb = AABB(
+            blockPosition().x - radius, blockPosition().y - radius, blockPosition().z - radius,
+            blockPosition().x + radius, blockPosition().y + radius, blockPosition().z + radius
+        )
+
+        val myCult = CultMemberManager.getCult(this)?.id ?: return
+
+        val sameCultFollowers = level().getEntitiesOfClass(
+            CultFollowerEntity::class.java,
+            aabb
+        ) { follower ->
+            follower != this && CultMemberManager.getCult(follower)?.id == myCult
+        }
+
+        sameCultFollowers.forEach { follower ->
+            follower.persistentAngerTarget = attacker.uuid
+            follower.startPersistentAngerTimer()
+            follower.target = attacker
+        }
     }
 
     override fun tick() {
@@ -72,44 +107,6 @@ class CultFollowerEntity(type: EntityType<CultFollowerEntity>, level: Level) : P
                 this.goalSelector.removeAllGoals { true }
                 this.registerGoals()
             }
-        }
-    }
-
-    override fun hurt(source: DamageSource, amount: Float): Boolean {
-        val attacker = source.entity
-
-        val result = super.hurt(source, amount)
-        if (result && attacker is LivingEntity) {
-            callNearbyFollowers(attacker)
-            persistentAngerTarget = attacker.uuid
-            startPersistentAngerTimer()
-            target = attacker
-        }
-        return result
-    }
-
-    private fun callNearbyFollowers(attacker: LivingEntity) {
-        if (level() == null) return
-
-        val radius = 20.0
-        val aabb = AABB(
-            blockPosition().x - radius, blockPosition().y - radius, blockPosition().z - radius,
-            blockPosition().x + radius, blockPosition().y + radius, blockPosition().z + radius
-        )
-
-        val myCult = CultMemberManager.getCult(this)?.id ?: return
-
-        val sameCultFollowers = level().getEntitiesOfClass(
-            CultFollowerEntity::class.java,
-            aabb
-        ) { follower ->
-            follower != this && CultMemberManager.getCult(follower)?.id == myCult
-        }
-
-        sameCultFollowers.forEach { follower ->
-            follower.persistentAngerTarget = attacker.uuid
-            follower.startPersistentAngerTimer()
-            follower.target = attacker
         }
     }
 

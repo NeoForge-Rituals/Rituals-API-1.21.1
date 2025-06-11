@@ -5,19 +5,35 @@ import net.haremal.ritualsapi.RitualsAPI
 import net.minecraft.core.BlockPos
 import net.minecraft.resources.ResourceKey
 import net.minecraft.server.level.ServerLevel
+import net.minecraft.world.effect.MobEffectInstance
+import net.minecraft.world.effect.MobEffects
+import net.minecraft.world.entity.Entity
+import net.minecraft.world.entity.EntityType
+import net.minecraft.world.entity.LivingEntity
+import net.minecraft.world.entity.decoration.LeashFenceKnotEntity
 import net.minecraft.world.entity.player.Player
 import net.minecraft.world.item.Items
+import net.minecraft.world.item.ShovelItem
 import net.minecraft.world.level.Level
+import net.minecraft.world.level.block.Blocks
 import net.minecraft.world.phys.AABB
+import net.minecraft.world.phys.Vec3
 import net.neoforged.bus.api.SubscribeEvent
 import net.neoforged.fml.common.EventBusSubscriber
+import net.neoforged.neoforge.common.Tags
+import net.neoforged.neoforge.event.entity.living.LivingDamageEvent
 import net.neoforged.neoforge.event.entity.living.LivingEntityUseItemEvent
+import net.neoforged.neoforge.event.entity.living.LivingEvent
+import net.neoforged.neoforge.event.entity.player.PlayerInteractEvent
+import net.neoforged.neoforge.event.tick.EntityTickEvent
 import net.neoforged.neoforge.event.tick.ServerTickEvent
+import java.util.UUID
+import kotlin.uuid.toKotlinUuid
 
 @EventBusSubscriber(modid = RitualsAPI.Companion.MODID, bus = EventBusSubscriber.Bus.GAME)
 object RitualEventsSG {
     @SubscribeEvent
-    fun onServerTick(event: ServerTickEvent.Post) {
+    fun bloodDropping(event: ServerTickEvent.Post) {
         BloodStainEntity.Companion.bloodDrop.entries.removeIf { (_, data) -> data.timer <= 0 }
         BloodStainEntity.Companion.bloodDrop.forEach { (player, data) ->
             data.timer = data.timer - 1
@@ -63,7 +79,7 @@ object RitualEventsSG {
     }
 
     @SubscribeEvent
-    fun onUseRitualDaggerItem(event: LivingEntityUseItemEvent.Tick){
+    fun useRitualDaggerItem(event: LivingEntityUseItemEvent.Tick){
         val player = event.entity
         if (event.item.item == Items.BRUSH && player is Player && !player.level().isClientSide) {
             val hit = player.pick(5.0, 0f, false)
@@ -77,4 +93,32 @@ object RitualEventsSG {
             entities.firstOrNull()?.discard()
         }
     }
+
+    @SubscribeEvent
+    fun knockOutWithAShovel(event: LivingDamageEvent.Pre) {
+        val target = event.entity
+        val attacker = event.source.entity
+
+        if (!target.level().isClientSide && attacker is Player && target is LivingEntity) {
+            val weapon = attacker.mainHandItem.item
+            if (weapon is ShovelItem) {
+                val behindDistance = 1.5
+                val targetPos = target.position()
+                val look = target.lookAngle.normalize()
+
+                // Calculate box behind the target
+                val behindPos = targetPos.subtract(look.scale(behindDistance))
+                println(behindPos)
+                val box = AABB(behindPos.x - 1.5, behindPos.y - 1.0, behindPos.z - 1.5,
+                    behindPos.x + 1.5, behindPos.y + 1.0, behindPos.z + 1.5)
+
+                if (box.contains(attacker.position())) {
+                    target.addEffect(MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 200, 10)) // placeholder
+                    target.addEffect(MobEffectInstance(MobEffects.BLINDNESS, 200))
+                    target.addEffect(MobEffectInstance(MobEffects.WEAKNESS, 200))
+                }
+            }
+        }
+    }
 }
+

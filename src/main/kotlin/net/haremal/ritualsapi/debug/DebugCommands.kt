@@ -54,7 +54,6 @@ object DebugCommands {
                     )
             )
     }
-
     private fun leave(): LiteralArgumentBuilder<CommandSourceStack> {
         return Commands.literal("leave")
             .then(
@@ -67,7 +66,6 @@ object DebugCommands {
                     }
             )
     }
-
     private fun info(): LiteralArgumentBuilder<CommandSourceStack> {
         return Commands.literal("info")
             .then(
@@ -86,5 +84,4 @@ object DebugCommands {
                     }
             )
     }
-
 }
