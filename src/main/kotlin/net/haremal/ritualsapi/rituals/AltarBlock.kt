@@ -27,9 +27,6 @@ import kotlin.math.sqrt
 
 class AltarBlock(properties: Properties) : Block(properties), EntityBlock {
     enum class AltarLevel(val requiredFollowersAmount: Int) { SIMPLE(1), MINOR(3), STANDARD(6), MAJOR(9), GRAND(12), APOCALYPTIC(15) }
-    override fun getShape(state: BlockState, level: BlockGetter, pos: BlockPos, context: CollisionContext): VoxelShape {
-        return super.getShape(state, level, pos, context)
-    }
 
     override fun newBlockEntity(pos: BlockPos, state: BlockState) = AltarBlockEntity(pos, state)
     override fun <T : BlockEntity> getTicker(level: Level, state: BlockState, type: BlockEntityType<T>): BlockEntityTicker<T>? {
@@ -45,7 +42,6 @@ class AltarBlock(properties: Properties) : Block(properties), EntityBlock {
         val followerTargets = mutableMapOf<CultFollowerEntity, Triple<Double, Double, Double>>()
         var ritualActive: Boolean = false
         var ritual: Ritual? = null
-
 
         fun tick() {
             val level = level ?: return

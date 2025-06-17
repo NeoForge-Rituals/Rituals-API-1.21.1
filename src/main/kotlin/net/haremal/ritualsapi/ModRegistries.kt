@@ -6,6 +6,7 @@ import net.haremal.ritualsapi.debug.DebugWand
 import net.haremal.ritualsapi.rituals.AltarBlock
 import net.haremal.ritualsapi.rituals.BloodStainEntity
 import net.haremal.ritualsapi.cults.CultFollowerEntity
+import net.haremal.ritualsapi.rituals.CageBlock
 import net.haremal.ritualsapi.rituals.RitualDaggerItem
 import net.minecraft.core.registries.BuiltInRegistries
 import net.minecraft.core.registries.Registries
@@ -25,6 +26,7 @@ import net.neoforged.neoforge.registries.DeferredItem
 import net.neoforged.neoforge.registries.DeferredRegister
 
 
+@Suppress("NULLABILITY_MISMATCH_BASED_ON_JAVA_ANNOTATIONS")
 object ModRegistries {
     val ENTITY_TYPES: DeferredRegister<EntityType<*>?> = DeferredRegister.create(BuiltInRegistries.ENTITY_TYPE, MODID)
         val CULT_FOLLOWER_ENTITY: DeferredHolder<EntityType<*>?, EntityType<CultFollowerEntity>?> = ENTITY_TYPES.register("cult_follower", Supplier<EntityType<CultFollowerEntity>> {
@@ -33,6 +35,7 @@ object ModRegistries {
         val BLOOD_STAIN_ENTITY: DeferredHolder<EntityType<*>?, EntityType<BloodStainEntity>?> = ENTITY_TYPES.register("blood_stain", Supplier {
             EntityType.Builder.of(::BloodStainEntity, MobCategory.MISC).sized(0.5f, 0.05f).clientTrackingRange(64).build("blood_stain")
         })
+
 
     val ITEMS: DeferredRegister.Items = DeferredRegister.createItems(MODID)
         val RITUAL_DAGGER_ITEM: DeferredItem<RitualDaggerItem?> = ITEMS.register("ritual_dagger", Supplier {
@@ -45,20 +48,28 @@ object ModRegistries {
             DebugWand(Item.Properties())
         })
 
+
     val BLOCKS: DeferredRegister.Blocks = DeferredRegister.createBlocks(MODID)
-        val ALTAR_BLOCK: DeferredBlock<AltarBlock> = BLOCKS.register("altar", Supplier {
-            AltarBlock(Properties.of().strength(3.0f).noOcclusion())
-        })
     val BLOCK_ENTITY_TYPES: DeferredRegister<BlockEntityType<*>> = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, MODID)
-        val ALTAR_BLOCK_ENTITY: DeferredHolder<BlockEntityType<*>?, BlockEntityType<AltarBlock.AltarBlockEntity?>?> = BLOCK_ENTITY_TYPES.register("altar_block_entity", Supplier {
-            BlockEntityType.Builder.of(AltarBlock::AltarBlockEntity, ALTAR_BLOCK.get()).build(null)
-        })
-
-
     val BLOCK_ITEMS: DeferredRegister<Item?> = DeferredRegister.create(Registries.ITEM, MODID)
-        val ALTAR_BLOCK_ITEM: DeferredHolder<Item?, BlockItem?> = BLOCK_ITEMS.register("altar", Supplier {
-            BlockItem(ALTAR_BLOCK.get(), Item.Properties())
-        })
+        val ALTAR_BLOCK: DeferredBlock<AltarBlock> = BLOCKS.register("altar", Supplier {
+                AltarBlock(Properties.of().strength(3.0f).noOcclusion())
+            })
+            val ALTAR_BLOCK_ENTITY: DeferredHolder<BlockEntityType<*>?, BlockEntityType<AltarBlock.AltarBlockEntity?>?> = BLOCK_ENTITY_TYPES.register("altar_block_entity", Supplier {
+                BlockEntityType.Builder.of(AltarBlock::AltarBlockEntity, ALTAR_BLOCK.get()).build(null)
+            })
+            val ALTAR_BLOCK_ITEM: DeferredHolder<Item?, BlockItem?> = BLOCK_ITEMS.register("altar", Supplier {
+                BlockItem(ALTAR_BLOCK.get(), Item.Properties())
+            })
+        val CAGE_BLOCK: DeferredBlock<CageBlock> = BLOCKS.register("cage", Supplier {
+                CageBlock(Properties.of().strength(5.0f).noOcclusion().noCollission())
+            })
+            val CAGE_BLOCK_ENTITY: DeferredHolder<BlockEntityType<*>?, BlockEntityType<CageBlock.CageBlockEntity?>?> = BLOCK_ENTITY_TYPES.register("cage_block_entity", Supplier {
+                BlockEntityType.Builder.of(CageBlock::CageBlockEntity, CAGE_BLOCK.get()).build(null)
+            })
+            val CAGE_BLOCK_ITEM: DeferredHolder<Item?, BlockItem?> = BLOCK_ITEMS.register("cage", Supplier {
+                BlockItem(CAGE_BLOCK.get(), Item.Properties())
+            })
 
 
     val CREATIVE_MODE_TABS: DeferredRegister<CreativeModeTab> = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MODID)
